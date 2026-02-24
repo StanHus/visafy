@@ -13,7 +13,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
             <span className="text-xl font-bold text-gray-900 tracking-tight">
-              Visafy
+              KORE
             </span>
           </Link>
 

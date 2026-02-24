@@ -3,7 +3,7 @@ import { SessionProvider } from "next-auth/react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Visafy — Spain Immigration Made Simple",
+  title: "KORE — Spain Immigration Made Simple",
   description:
     "Your trusted partner for Spain visa and immigration applications. Start your journey today.",
 };

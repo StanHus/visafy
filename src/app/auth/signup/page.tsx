@@ -60,7 +60,7 @@ export default function SignUpPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-6">
             <span className="text-xl font-bold text-gray-900 tracking-tight">
-              Visafy
+              KORE
             </span>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">

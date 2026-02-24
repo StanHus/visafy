@@ -1,5 +1,5 @@
 {
-  "name": "visafy",
+  "name": "kore",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -12,15 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/StanHus/visafy.git"
+    "url": "git+https://github.com/StanHus/kore.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/StanHus/visafy/issues"
+    "url": "https://github.com/StanHus/kore/issues"
   },
-  "homepage": "https://github.com/StanHus/visafy#readme",
+  "homepage": "https://github.com/StanHus/kore#readme",
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
     "@vercel/blob": "^2.3.0",

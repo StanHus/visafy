@@ -86,10 +86,10 @@ export default function LandingPage() {
       <footer className="py-8 px-4 border-t border-gray-100">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <span className="text-sm font-semibold text-gray-900 tracking-tight">
-            Visafy
+            KORE
           </span>
           <p className="text-sm text-gray-400">
-            &copy; {new Date().getFullYear()} Visafy. All rights reserved.
+            &copy; {new Date().getFullYear()} KORE. All rights reserved.
           </p>
         </div>
       </footer>

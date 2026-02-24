@@ -74,7 +74,7 @@ export default function DashboardPage() {
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="text-lg font-bold text-gray-900 tracking-tight">
-            Visafy
+            KORE
           </Link>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-400">

@@ -148,7 +148,7 @@ export default function OnboardingPage() {
       <div className="border-b border-gray-100">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="text-lg font-bold text-gray-900 tracking-tight">
-            Visafy
+            KORE
           </Link>
           <span className="text-sm text-gray-400">
             {session?.user?.email}
