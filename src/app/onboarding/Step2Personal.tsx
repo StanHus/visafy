@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { useLanguage } from "@/lib/i18n-context";
 import type { FormData } from "./page";
 
 interface Props {
@@ -20,6 +21,7 @@ export default function Step2Personal({
   saving,
   userEmail,
 }: Props) {
+  const { t } = useLanguage();
   const [fields, setFields] = useState({
     fullName: formData.fullName || "",
     dateOfBirth: formData.dateOfBirth || "",
@@ -33,17 +35,19 @@ export default function Step2Personal({
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const f = t.onboarding.fields;
+
   const validate = () => {
     const errs: Record<string, string> = {};
-    if (!fields.fullName.trim()) errs.fullName = "Full name is required";
-    if (!fields.dateOfBirth) errs.dateOfBirth = "Date of birth is required";
-    if (!fields.nationality.trim()) errs.nationality = "Nationality is required";
-    if (!fields.passportNumber.trim()) errs.passportNumber = "Passport number is required";
-    if (!fields.passportExpiry) errs.passportExpiry = "Passport expiry is required";
-    if (!fields.phone.trim()) errs.phone = "Phone number is required";
-    if (!fields.email.trim()) errs.email = "Email is required";
-    if (!fields.country.trim()) errs.country = "Country is required";
-    if (!fields.city.trim()) errs.city = "City is required";
+    if (!fields.fullName.trim()) errs.fullName = t.validation.required.replace("{field}", f.fullName.label);
+    if (!fields.dateOfBirth) errs.dateOfBirth = t.validation.required.replace("{field}", f.dateOfBirth.label);
+    if (!fields.nationality.trim()) errs.nationality = t.validation.required.replace("{field}", f.nationality.label);
+    if (!fields.passportNumber.trim()) errs.passportNumber = t.validation.required.replace("{field}", f.passportNumber.label);
+    if (!fields.passportExpiry) errs.passportExpiry = t.validation.required.replace("{field}", f.passportExpiry.label);
+    if (!fields.phone.trim()) errs.phone = t.validation.required.replace("{field}", f.phone.label);
+    if (!fields.email.trim()) errs.email = t.validation.required.replace("{field}", f.email.label);
+    if (!fields.country.trim()) errs.country = t.validation.required.replace("{field}", f.country.label);
+    if (!fields.city.trim()) errs.city = t.validation.required.replace("{field}", f.city.label);
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -68,25 +72,25 @@ export default function Step2Personal({
   return (
     <div>
       <h2 className="text-xl font-semibold text-gray-900 mb-1">
-        Personal information
+        {t.onboarding.step2Title}
       </h2>
-      <p className="text-sm text-gray-500 mb-8">
-        Enter your details as they appear on your passport.
+      <p className="text-sm text-gray-500 mb-6 sm:mb-8">
+        {t.onboarding.step2Subtitle}
       </p>
 
       <div className="space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <Input
             id="fullName"
-            label="Full Name"
-            placeholder="As on passport"
+            label={f.fullName.label}
+            placeholder={f.fullName.placeholder}
             value={fields.fullName}
             onChange={(e) => updateField("fullName", e.target.value)}
             error={errors.fullName}
           />
           <Input
             id="dateOfBirth"
-            label="Date of Birth"
+            label={f.dateOfBirth.label}
             type="date"
             value={fields.dateOfBirth}
             onChange={(e) => updateField("dateOfBirth", e.target.value)}
@@ -96,8 +100,8 @@ export default function Step2Personal({
 
         <Input
           id="nationality"
-          label="Nationality"
-          placeholder="e.g. United States"
+          label={f.nationality.label}
+          placeholder={f.nationality.placeholder}
           value={fields.nationality}
           onChange={(e) => updateField("nationality", e.target.value)}
           error={errors.nationality}
@@ -106,15 +110,15 @@ export default function Step2Personal({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <Input
             id="passportNumber"
-            label="Passport Number"
-            placeholder="e.g. AB1234567"
+            label={f.passportNumber.label}
+            placeholder={f.passportNumber.placeholder}
             value={fields.passportNumber}
             onChange={(e) => updateField("passportNumber", e.target.value)}
             error={errors.passportNumber}
           />
           <Input
             id="passportExpiry"
-            label="Passport Expiry Date"
+            label={f.passportExpiry.label}
             type="date"
             value={fields.passportExpiry}
             onChange={(e) => updateField("passportExpiry", e.target.value)}
@@ -125,16 +129,16 @@ export default function Step2Personal({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <Input
             id="phone"
-            label="Phone Number"
+            label={f.phone.label}
             type="tel"
-            placeholder="+1 234 567 8900"
+            placeholder={f.phone.placeholder}
             value={fields.phone}
             onChange={(e) => updateField("phone", e.target.value)}
             error={errors.phone}
           />
           <Input
             id="email"
-            label="Email Address"
+            label={f.email.label}
             type="email"
             value={fields.email}
             onChange={(e) => updateField("email", e.target.value)}
@@ -145,16 +149,16 @@ export default function Step2Personal({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <Input
             id="country"
-            label="Current Country"
-            placeholder="e.g. United States"
+            label={f.country.label}
+            placeholder={f.country.placeholder}
             value={fields.country}
             onChange={(e) => updateField("country", e.target.value)}
             error={errors.country}
           />
           <Input
             id="city"
-            label="Current City"
-            placeholder="e.g. New York"
+            label={f.city.label}
+            placeholder={f.city.placeholder}
             value={fields.city}
             onChange={(e) => updateField("city", e.target.value)}
             error={errors.city}
@@ -162,12 +166,12 @@ export default function Step2Personal({
         </div>
       </div>
 
-      <div className="flex justify-between mt-8">
+      <div className="flex justify-between gap-3 mt-8 md:static fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 md:border-0 md:p-0 md:bg-transparent">
         <Button variant="outline" onClick={onBack}>
-          Back
+          {t.onboarding.back}
         </Button>
         <Button onClick={handleNext} loading={saving}>
-          Continue
+          {t.onboarding.continue}
           <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>

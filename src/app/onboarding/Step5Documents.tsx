@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import Button from "@/components/ui/Button";
+import { useLanguage } from "@/lib/i18n-context";
 import type { FormData, UploadedDoc } from "./page";
 
 interface Props {
@@ -14,54 +15,13 @@ interface Props {
   saving: boolean;
 }
 
-const requiredDocsByVisa: Record<string, { type: string; label: string }[]> = {
-  work_visa: [
-    { type: "passport", label: "Passport Copy" },
-    { type: "photo", label: "Passport Photo" },
-    { type: "employment_contract", label: "Employment Contract" },
-    { type: "criminal_record", label: "Criminal Record Certificate" },
-    { type: "health_insurance", label: "Health Insurance" },
-  ],
-  golden_visa: [
-    { type: "passport", label: "Passport Copy" },
-    { type: "photo", label: "Passport Photo" },
-    { type: "proof_of_income", label: "Proof of Investment" },
-    { type: "bank_statement", label: "Bank Statement" },
-    { type: "criminal_record", label: "Criminal Record Certificate" },
-    { type: "health_insurance", label: "Health Insurance" },
-  ],
-  student_visa: [
-    { type: "passport", label: "Passport Copy" },
-    { type: "photo", label: "Passport Photo" },
-    { type: "bank_statement", label: "Bank Statement" },
-    { type: "health_insurance", label: "Health Insurance" },
-    { type: "accommodation_proof", label: "Accommodation Proof" },
-  ],
-  digital_nomad: [
-    { type: "passport", label: "Passport Copy" },
-    { type: "photo", label: "Passport Photo" },
-    { type: "proof_of_income", label: "Proof of Remote Income" },
-    { type: "employment_contract", label: "Employment/Client Contract" },
-    { type: "health_insurance", label: "Health Insurance" },
-    { type: "criminal_record", label: "Criminal Record Certificate" },
-  ],
-  family_reunification: [
-    { type: "passport", label: "Passport Copy" },
-    { type: "photo", label: "Passport Photo" },
-    { type: "proof_of_income", label: "Sponsor's Income Proof" },
-    { type: "accommodation_proof", label: "Accommodation Proof" },
-    { type: "criminal_record", label: "Criminal Record Certificate" },
-    { type: "health_insurance", label: "Health Insurance" },
-  ],
-  non_lucrative: [
-    { type: "passport", label: "Passport Copy" },
-    { type: "photo", label: "Passport Photo" },
-    { type: "bank_statement", label: "Bank Statement (12 months)" },
-    { type: "proof_of_income", label: "Proof of Income/Funds" },
-    { type: "health_insurance", label: "Health Insurance" },
-    { type: "criminal_record", label: "Criminal Record Certificate" },
-    { type: "accommodation_proof", label: "Accommodation Proof" },
-  ],
+const requiredDocsByVisa: Record<string, string[]> = {
+  work_visa: ["passport", "photo", "employment_contract", "criminal_record", "health_insurance"],
+  golden_visa: ["passport", "photo", "proof_of_income", "bank_statement", "criminal_record", "health_insurance"],
+  student_visa: ["passport", "photo", "bank_statement", "health_insurance", "accommodation_proof"],
+  digital_nomad: ["passport", "photo", "proof_of_income", "employment_contract", "health_insurance", "criminal_record"],
+  family_reunification: ["passport", "photo", "proof_of_income", "accommodation_proof", "criminal_record", "health_insurance"],
+  non_lucrative: ["passport", "photo", "bank_statement", "proof_of_income", "health_insurance", "criminal_record", "accommodation_proof"],
 };
 
 export default function Step5Documents({
@@ -73,17 +33,23 @@ export default function Step5Documents({
   onBack,
   saving,
 }: Props) {
+  const { t } = useLanguage();
   const [uploading, setUploading] = useState<string | null>(null);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [currentDocType, setCurrentDocType] = useState("");
 
   const visaType = formData.visaType || "work_visa";
-  const requiredDocs = requiredDocsByVisa[visaType] || requiredDocsByVisa.work_visa;
+  const docKeys = requiredDocsByVisa[visaType] || requiredDocsByVisa.work_visa;
+  const dl = t.onboarding.docLabels;
+
+  const getDocLabel = (type: string) => {
+    return dl[type as keyof typeof dl] || type.replace(/_/g, " ");
+  };
 
   const handleUpload = async (file: File, docType: string) => {
     if (!applicationId) {
-      setError("Application not found. Please go back and try again.");
+      setError(t.onboarding.step5Error);
       return;
     }
 
@@ -104,7 +70,7 @@ export default function Step5Documents({
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Upload failed");
+        setError(data.error || t.onboarding.uploadFailed);
         return;
       }
 
@@ -113,7 +79,7 @@ export default function Step5Documents({
         data.document,
       ]);
     } catch {
-      setError("Upload failed. Please try again.");
+      setError(t.onboarding.uploadFailed);
     } finally {
       setUploading(null);
     }
@@ -143,10 +109,10 @@ export default function Step5Documents({
   return (
     <div>
       <h2 className="text-xl font-semibold text-gray-900 mb-1">
-        Upload documents
+        {t.onboarding.step5Title}
       </h2>
-      <p className="text-sm text-gray-500 mb-8">
-        Upload required documents. PDF, JPG, or PNG up to 10MB each.
+      <p className="text-sm text-gray-500 mb-6 sm:mb-8">
+        {t.onboarding.step5Subtitle}
       </p>
 
       {error && (
@@ -164,22 +130,22 @@ export default function Step5Documents({
       />
 
       <div className="space-y-2">
-        {requiredDocs.map((doc) => {
-          const uploaded = getDocStatus(doc.type);
-          const isUploading = uploading === doc.type;
+        {docKeys.map((docType) => {
+          const uploaded = getDocStatus(docType);
+          const isUploading = uploading === docType;
 
           return (
             <div
-              key={doc.type}
-              className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
+              key={docType}
+              className={`flex items-center justify-between p-3 sm:p-4 rounded-xl border transition-all ${
                 uploaded
                   ? "border-green-200 bg-green-50/50"
                   : "border-gray-200 bg-white hover:border-gray-300"
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
                 <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
                     uploaded
                       ? "bg-green-100 text-green-600"
                       : "bg-gray-100 text-gray-400"
@@ -195,18 +161,18 @@ export default function Step5Documents({
                     </svg>
                   )}
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{doc.label}</p>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">{getDocLabel(docType)}</p>
                   {uploaded && (
-                    <p className="text-xs text-green-600">{uploaded.fileName}</p>
+                    <p className="text-xs text-green-600 truncate">{uploaded.fileName}</p>
                   )}
                 </div>
               </div>
 
               <button
-                onClick={() => triggerUpload(doc.type)}
+                onClick={() => triggerUpload(docType)}
                 disabled={isUploading}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                className={`ml-2 px-3 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer min-h-[36px] flex-shrink-0 ${
                   uploaded
                     ? "text-gray-500 hover:text-gray-700 border border-gray-200 hover:border-gray-300"
                     : "text-indigo-600 hover:text-indigo-700 border border-indigo-200 hover:border-indigo-300"
@@ -218,12 +184,12 @@ export default function Step5Documents({
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    Uploading
+                    {t.onboarding.uploading}
                   </span>
                 ) : uploaded ? (
-                  "Replace"
+                  t.onboarding.replace
                 ) : (
-                  "Upload"
+                  t.onboarding.upload
                 )}
               </button>
             </div>
@@ -232,16 +198,16 @@ export default function Step5Documents({
       </div>
 
       <p className="mt-4 text-xs text-gray-400">
-        {uploadedDocs.length} of {requiredDocs.length} documents uploaded.
-        You can continue and upload remaining documents later.
+        {uploadedDocs.length} / {docKeys.length} {t.onboarding.docsUploaded}{" "}
+        {t.onboarding.docsNote}
       </p>
 
-      <div className="flex justify-between mt-8">
+      <div className="flex justify-between gap-3 mt-8 md:static fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 md:border-0 md:p-0 md:bg-transparent">
         <Button variant="outline" onClick={onBack}>
-          Back
+          {t.onboarding.back}
         </Button>
         <Button onClick={handleNext} loading={saving}>
-          Continue to Review
+          {t.onboarding.continueToReview}
           <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>

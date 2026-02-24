@@ -1,44 +1,38 @@
+"use client";
+
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
-
-const steps = [
-  {
-    num: "1",
-    title: "Create your account",
-    description: "Sign up and start your personalized immigration application.",
-  },
-  {
-    num: "2",
-    title: "Complete the application",
-    description: "Fill in your details through our guided multi-step form.",
-  },
-  {
-    num: "3",
-    title: "Submit and track",
-    description: "Submit your application and monitor its progress.",
-  },
-];
+import { useLanguage } from "@/lib/i18n-context";
 
 export default function LandingPage() {
+  const { t } = useLanguage();
+
+  const steps = [
+    { num: "1", title: t.landing.step1Title, description: t.landing.step1Desc },
+    { num: "2", title: t.landing.step2Title, description: t.landing.step2Desc },
+    { num: "3", title: t.landing.step3Title, description: t.landing.step3Desc },
+  ];
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       <Navbar />
 
-      {/* Hero */}
-      <section className="pt-32 pb-24 px-4">
+      {/* Hero — subtle warm gradient background */}
+      <section className="pt-28 sm:pt-32 pb-20 sm:pb-24 px-4 sm:px-8 bg-gradient-to-b from-stone-50/80 via-white to-white relative">
+        {/* Decorative warm accent line */}
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-amber-400/60 rounded-full" />
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight leading-[1.15] mb-6">
-            Your path to Spain, simplified.
+          <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 tracking-tight leading-[1.15] mb-6">
+            {t.landing.heroTitle}
           </h1>
-          <p className="text-lg text-gray-500 mb-10 max-w-xl mx-auto leading-relaxed">
-            Navigate Spain&apos;s immigration process with a guided application
-            that handles every step for you.
+          <p className="text-base sm:text-lg text-gray-500 mb-10 max-w-xl mx-auto leading-relaxed">
+            {t.landing.heroSubtitle}
           </p>
           <Link
             href="/auth/signup"
-            className="inline-flex items-center justify-center px-8 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm text-base"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 min-h-[48px] bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm text-base"
           >
-            Start your application
+            {t.landing.cta}
             <svg
               className="ml-2 w-4 h-4"
               fill="none"
@@ -57,14 +51,14 @@ export default function LandingPage() {
       </section>
 
       {/* How it works */}
-      <section id="how-it-works" className="py-20 px-4 bg-gray-50/60">
+      <section id="how-it-works" className="py-16 sm:py-20 px-4 sm:px-8 bg-gray-50/60">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-2xl font-semibold text-gray-900 text-center mb-12">
-            How it works
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 text-center mb-10 sm:mb-12">
+            {t.landing.howItWorks}
           </h2>
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {steps.map((item) => (
-              <div key={item.num} className="flex gap-5">
+              <div key={item.num} className="flex gap-4 sm:gap-5">
                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-900 text-white text-sm font-medium flex items-center justify-center">
                   {item.num}
                 </div>
@@ -83,13 +77,13 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 border-t border-gray-100">
+      <footer className="py-8 px-4 sm:px-8 border-t border-gray-100">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <span className="text-sm font-semibold text-gray-900 tracking-tight">
             KORE
           </span>
           <p className="text-sm text-gray-400">
-            &copy; {new Date().getFullYear()} KORE. All rights reserved.
+            &copy; {new Date().getFullYear()} KORE. {t.landing.footerRights}
           </p>
         </div>
       </footer>

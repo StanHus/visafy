@@ -4,21 +4,13 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useLanguage } from "@/lib/i18n-context";
 import Step1VisaType from "./Step1VisaType";
 import Step2Personal from "./Step2Personal";
 import Step3VisaDetails from "./Step3VisaDetails";
 import Step4Financial from "./Step4Financial";
 import Step5Documents from "./Step5Documents";
 import Step6Review from "./Step6Review";
-
-const STEP_TITLES = [
-  "Visa Type",
-  "Personal",
-  "Details",
-  "Financial",
-  "Documents",
-  "Review",
-];
 
 export type FormData = Record<string, string>;
 export type UploadedDoc = {
@@ -32,12 +24,15 @@ export type UploadedDoc = {
 export default function OnboardingPage() {
   const { data: session } = useSession();
   const router = useRouter();
+  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [applicationId, setApplicationId] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({});
   const [uploadedDocs, setUploadedDocs] = useState<UploadedDoc[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  const STEP_TITLES = t.onboarding.stepTitles;
 
   useEffect(() => {
     async function loadApplication() {
@@ -143,14 +138,14 @@ export default function OnboardingPage() {
   const progress = ((currentStep - 1) / (STEP_TITLES.length - 1)) * 100;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pb-24 md:pb-0">
       {/* Header */}
       <div className="border-b border-gray-100">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="text-lg font-bold text-gray-900 tracking-tight">
             KORE
           </Link>
-          <span className="text-sm text-gray-400">
+          <span className="text-sm text-gray-400 truncate ml-4">
             {session?.user?.email}
           </span>
         </div>
@@ -165,7 +160,7 @@ export default function OnboardingPage() {
               const isActive = stepNum === currentStep;
               const isCompleted = stepNum < currentStep;
               return (
-                <div key={title} className="flex flex-col items-center flex-1">
+                <div key={idx} className="flex flex-col items-center flex-1">
                   <div
                     className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 ${
                       isCompleted
@@ -204,7 +199,7 @@ export default function OnboardingPage() {
       </div>
 
       {/* Step Content */}
-      <div className="max-w-2xl mx-auto px-4 py-10">
+      <div className="max-w-2xl mx-auto px-4 py-6 sm:py-10">
         <div className="animate-fade-in">
           {currentStep === 1 && (
             <Step1VisaType formData={formData} onNext={handleNext} saving={saving} />

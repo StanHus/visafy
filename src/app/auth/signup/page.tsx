@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { useLanguage } from "@/lib/i18n-context";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +32,7 @@ export default function SignUpPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Something went wrong");
+        setError(data.error || t.auth.errorGeneric);
         setLoading(false);
         return;
       }
@@ -42,13 +44,13 @@ export default function SignUpPage() {
       });
 
       if (result?.error) {
-        setError("Account created but could not sign in automatically.");
+        setError(t.auth.errorAutoSignIn);
       } else {
         router.push("/onboarding");
         router.refresh();
       }
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t.auth.errorGeneric);
     } finally {
       setLoading(false);
     }
@@ -64,20 +66,20 @@ export default function SignUpPage() {
             </span>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">
-            Create an account
+            {t.auth.signUpTitle}
           </h1>
           <p className="text-sm text-gray-500">
-            Already have an account?{" "}
+            {t.auth.haveAccount}{" "}
             <Link
               href="/auth/signin"
               className="text-indigo-600 hover:text-indigo-700 font-medium"
             >
-              Sign in
+              {t.auth.signInLink}
             </Link>
           </p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6">
           {error && (
             <div className="mb-5 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
               {error}
@@ -87,40 +89,39 @@ export default function SignUpPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               id="fullName"
-              label="Full name"
+              label={t.auth.fullNameLabel}
               type="text"
-              placeholder="John Doe"
+              placeholder={t.auth.fullNamePlaceholder}
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
             />
             <Input
               id="email"
-              label="Email"
+              label={t.auth.emailLabel}
               type="email"
-              placeholder="you@example.com"
+              placeholder={t.auth.emailPlaceholder}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
             <Input
               id="password"
-              label="Password"
+              label={t.auth.passwordLabel}
               type="password"
-              placeholder="Min. 8 characters"
+              placeholder={t.auth.passwordPlaceholderNew}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
             />
             <Button type="submit" loading={loading} className="w-full" size="lg">
-              Create Account
+              {t.auth.createAccountButton}
             </Button>
           </form>
 
           <p className="mt-4 text-xs text-gray-400 text-center">
-            By creating an account, you agree to our Terms of Service and
-            Privacy Policy.
+            {t.auth.termsText}
           </p>
         </div>
       </div>

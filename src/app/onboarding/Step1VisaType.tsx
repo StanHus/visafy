@@ -2,16 +2,17 @@
 
 import { useState } from "react";
 import Button from "@/components/ui/Button";
+import { useLanguage } from "@/lib/i18n-context";
 import type { FormData } from "./page";
 
-const visaTypes = [
-  { id: "work_visa", title: "Work Visa", description: "Employment-based immigration with a job offer in Spain" },
-  { id: "golden_visa", title: "Golden Visa", description: "Residency through significant investment in Spain" },
-  { id: "student_visa", title: "Student Visa", description: "Study at Spanish educational institutions" },
-  { id: "digital_nomad", title: "Digital Nomad Visa", description: "Remote work for foreign companies from Spain" },
-  { id: "family_reunification", title: "Family Reunification", description: "Join family members who are legal residents" },
-  { id: "non_lucrative", title: "Non-Lucrative Visa", description: "Live in Spain with passive income or savings" },
-];
+const visaTypeIds = [
+  "work_visa",
+  "golden_visa",
+  "student_visa",
+  "digital_nomad",
+  "family_reunification",
+  "non_lucrative",
+] as const;
 
 interface Props {
   formData: FormData;
@@ -20,12 +21,13 @@ interface Props {
 }
 
 export default function Step1VisaType({ formData, onNext, saving }: Props) {
+  const { t } = useLanguage();
   const [selected, setSelected] = useState(formData.visaType || "");
   const [error, setError] = useState("");
 
   const handleNext = () => {
     if (!selected) {
-      setError("Please select a visa type to continue");
+      setError(t.onboarding.step1Error);
       return;
     }
     setError("");
@@ -35,10 +37,10 @@ export default function Step1VisaType({ formData, onNext, saving }: Props) {
   return (
     <div>
       <h2 className="text-xl font-semibold text-gray-900 mb-1">
-        Select your visa type
+        {t.onboarding.step1Title}
       </h2>
-      <p className="text-sm text-gray-500 mb-8">
-        Choose the visa category that fits your situation.
+      <p className="text-sm text-gray-500 mb-6 sm:mb-8">
+        {t.onboarding.step1Subtitle}
       </p>
 
       {error && (
@@ -48,43 +50,44 @@ export default function Step1VisaType({ formData, onNext, saving }: Props) {
       )}
 
       <div className="space-y-3 mb-8">
-        {visaTypes.map((visa) => (
-          <button
-            key={visa.id}
-            onClick={() => {
-              setSelected(visa.id);
-              setError("");
-            }}
-            className={`w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 cursor-pointer ${
-              selected === visa.id
-                ? "border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600"
-                : "border-gray-200 hover:border-gray-300 bg-white"
-            }`}
-          >
-            <div className="flex items-center gap-4">
-              <div
-                className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                  selected === visa.id
-                    ? "border-indigo-600"
-                    : "border-gray-300"
-                }`}
-              >
-                {selected === visa.id && (
-                  <div className="w-2 h-2 rounded-full bg-indigo-600" />
-                )}
+        {visaTypeIds.map((id) => {
+          const visa = t.onboarding.visaTypes[id];
+          return (
+            <button
+              key={id}
+              onClick={() => {
+                setSelected(id);
+                setError("");
+              }}
+              className={`w-full text-left px-4 sm:px-5 py-4 rounded-xl border transition-all duration-200 cursor-pointer min-h-[56px] ${
+                selected === id
+                  ? "border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600"
+                  : "border-gray-200 hover:border-gray-300 bg-white"
+              }`}
+            >
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div
+                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                    selected === id ? "border-indigo-600" : "border-gray-300"
+                  }`}
+                >
+                  {selected === id && (
+                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-600" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900">{visa.title}</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">{visa.description}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-900">{visa.title}</h3>
-                <p className="text-xs text-gray-500 mt-0.5">{visa.description}</p>
-              </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
 
-      <div className="flex justify-end">
-        <Button onClick={handleNext} loading={saving}>
-          Continue
+      <div className="flex justify-end md:static fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 md:border-0 md:p-0 md:bg-transparent">
+        <Button onClick={handleNext} loading={saving} className="w-full md:w-auto">
+          {t.onboarding.continue}
           <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>

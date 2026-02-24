@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { useLanguage } from "@/lib/i18n-context";
 
 export default function SignInPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -27,13 +29,13 @@ export default function SignInPage() {
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
+        setError(t.auth.errorInvalidCredentials);
       } else {
         router.push("/dashboard");
         router.refresh();
       }
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t.auth.errorGeneric);
     } finally {
       setLoading(false);
     }
@@ -48,19 +50,19 @@ export default function SignInPage() {
               KORE
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Sign in</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">{t.auth.signInTitle}</h1>
           <p className="text-sm text-gray-500">
-            Don&apos;t have an account?{" "}
+            {t.auth.noAccount}{" "}
             <Link
               href="/auth/signup"
               className="text-indigo-600 hover:text-indigo-700 font-medium"
             >
-              Create one
+              {t.auth.createOne}
             </Link>
           </p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6">
           {error && (
             <div className="mb-5 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
               {error}
@@ -70,24 +72,24 @@ export default function SignInPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               id="email"
-              label="Email"
+              label={t.auth.emailLabel}
               type="email"
-              placeholder="you@example.com"
+              placeholder={t.auth.emailPlaceholder}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
             <Input
               id="password"
-              label="Password"
+              label={t.auth.passwordLabel}
               type="password"
-              placeholder="Enter your password"
+              placeholder={t.auth.passwordPlaceholder}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
             <Button type="submit" loading={loading} className="w-full" size="lg">
-              Sign In
+              {t.auth.signInButton}
             </Button>
           </form>
         </div>
