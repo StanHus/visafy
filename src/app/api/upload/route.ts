@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { put } from "@vercel/blob";
+import { put, del } from "@vercel/blob";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { applications, documents } from "@/lib/db/schema";
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Fix C3: verify application ownership
+    // Verify application ownership
     const [app] = await db
       .select({ id: applications.id })
       .from(applications)
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Application not found" }, { status: 404 });
     }
 
-    // Fix C6: file size validation
+    // File size validation
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
         { error: "File too large. Maximum size is 10MB." },
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Fix C7: file type validation
+    // File type validation
     const ext = "." + (file.name.split(".").pop() || "").toLowerCase();
     if (!ALLOWED_UPLOAD_EXTENSIONS.includes(ext)) {
       return NextResponse.json(
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Fix C4/C5: use Vercel Blob storage instead of local filesystem
+    // Upload to Vercel Blob storage
     const blob = await put(`documents/${applicationId}/${crypto.randomUUID()}${ext}`, file, {
       access: "public",
     });
@@ -88,6 +88,63 @@ export async function POST(request: Request) {
     console.error("Upload error:", error);
     return NextResponse.json(
       { error: "Upload failed" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const { documentId, applicationId } = await request.json();
+
+    if (!documentId || !applicationId) {
+      return NextResponse.json(
+        { error: "Document ID and application ID are required" },
+        { status: 400 }
+      );
+    }
+
+    // Verify application ownership
+    const [app] = await db
+      .select({ id: applications.id })
+      .from(applications)
+      .where(and(eq(applications.id, applicationId), eq(applications.userId, session.user.id)));
+
+    if (!app) {
+      return NextResponse.json({ error: "Application not found" }, { status: 404 });
+    }
+
+    // Fetch the document to get the blob URL
+    const [doc] = await db
+      .select({ id: documents.id, fileUrl: documents.fileUrl })
+      .from(documents)
+      .where(and(eq(documents.id, documentId), eq(documents.applicationId, applicationId)));
+
+    if (!doc) {
+      return NextResponse.json({ error: "Document not found" }, { status: 404 });
+    }
+
+    // Delete from Vercel Blob
+    try {
+      await del(doc.fileUrl);
+    } catch {
+      // If blob deletion fails, still remove from DB
+      console.error("Failed to delete blob, continuing with DB cleanup");
+    }
+
+    // Delete from database
+    await db.delete(documents).where(eq(documents.id, documentId));
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Delete document error:", error);
+    return NextResponse.json(
+      { error: "Failed to delete document" },
       { status: 500 }
     );
   }

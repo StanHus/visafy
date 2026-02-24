@@ -19,10 +19,10 @@ export const FUND_SOURCE_LABELS: Record<string, string> = {
 
 export const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   draft: { label: "Draft", color: "text-gray-700", bg: "bg-gray-100" },
-  submitted: { label: "Submitted", color: "text-blue-700", bg: "bg-blue-100" },
-  under_review: { label: "Under Review", color: "text-yellow-700", bg: "bg-yellow-100" },
-  additional_info_needed: { label: "Info Needed", color: "text-amber-700", bg: "bg-amber-50" },
-  approved: { label: "Approved", color: "text-green-700", bg: "bg-green-100" },
+  submitted: { label: "Submitted", color: "text-brand-700", bg: "bg-brand-50" },
+  under_review: { label: "Under Review", color: "text-brand-700", bg: "bg-brand-50" },
+  additional_info_needed: { label: "Info Needed", color: "text-brand-700", bg: "bg-brand-50" },
+  approved: { label: "Approved", color: "text-accent-600", bg: "bg-accent-50" },
   rejected: { label: "Rejected", color: "text-red-700", bg: "bg-red-100" },
 };
 

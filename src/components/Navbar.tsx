@@ -63,7 +63,7 @@ export default function Navbar() {
                     onClick={() => setLang(l.code)}
                     className={`px-1 py-0.5 transition-all duration-200 cursor-pointer ${
                       lang === l.code
-                        ? "text-gray-900 font-semibold underline underline-offset-2"
+                        ? "text-brand-600 font-semibold underline underline-offset-2 decoration-brand-600"
                         : "hover:text-gray-600"
                     }`}
                   >

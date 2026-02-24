@@ -9,6 +9,14 @@ import StaggerChildren from "@/components/animations/StaggerChildren";
 import { VISA_LABELS } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n-context";
 
+interface DocInfo {
+  id: string;
+  fileName: string;
+  fileUrl: string;
+  documentType: string;
+  status: string;
+}
+
 interface Application {
   id: string;
   visaType: string | null;
@@ -17,15 +25,15 @@ interface Application {
   createdAt: string;
   updatedAt: string;
   fields: Record<string, string>;
+  documents: DocInfo[];
 }
 
-// Muted pastel status colors
 const STATUS_STYLES: Record<string, { label: string; color: string; bg: string }> = {
   draft: { label: "Draft", color: "text-gray-600", bg: "bg-gray-100" },
-  submitted: { label: "Submitted", color: "text-sky-700", bg: "bg-sky-50" },
-  under_review: { label: "Under Review", color: "text-amber-700", bg: "bg-amber-50" },
-  additional_info_needed: { label: "Info Needed", color: "text-amber-700", bg: "bg-amber-50" },
-  approved: { label: "Approved", color: "text-emerald-700", bg: "bg-emerald-50" },
+  submitted: { label: "Submitted", color: "text-brand-700", bg: "bg-brand-50" },
+  under_review: { label: "Under Review", color: "text-brand-700", bg: "bg-brand-50" },
+  additional_info_needed: { label: "Info Needed", color: "text-brand-700", bg: "bg-brand-50" },
+  approved: { label: "Approved", color: "text-accent-700", bg: "bg-accent-50" },
   rejected: { label: "Rejected", color: "text-rose-700", bg: "bg-rose-50" },
 };
 
@@ -34,18 +42,26 @@ const formatDate = (d: string) => {
   return isNaN(date.getTime()) ? "\u2014" : date.toLocaleDateString();
 };
 
+function isImageFile(fileName: string) {
+  const ext = fileName.toLowerCase().split(".").pop();
+  return ext === "jpg" || ext === "jpeg" || ext === "png";
+}
+
 export default function DashboardPage() {
   const { data: session } = useSession();
   const { t } = useLanguage();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedApp, setExpandedApp] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
       try {
         const res = await fetch("/api/applications");
         const data = await res.json();
-        setApplications(data);
+        if (Array.isArray(data)) {
+          setApplications(data);
+        }
       } catch (err) {
         console.error("Failed to load applications:", err);
       } finally {
@@ -55,29 +71,10 @@ export default function DashboardPage() {
     load();
   }, []);
 
-  const app = applications[0];
-  const statusInfo = app ? STATUS_STYLES[app.status] || STATUS_STYLES.draft : null;
-
-  const timelineStepDefs = [
-    { status: "draft", label: t.dashboard.timelineSteps.draft },
-    { status: "submitted", label: t.dashboard.timelineSteps.submitted },
-    { status: "under_review", label: t.dashboard.timelineSteps.under_review },
-    { status: "approved", label: t.dashboard.timelineSteps.approved },
-  ];
-
-  const getTimelineStatus = (stepStatus: string) => {
-    const statusOrder = ["draft", "submitted", "under_review", "approved"];
-    const currentIdx = statusOrder.indexOf(app?.status || "draft");
-    const stepIdx = statusOrder.indexOf(stepStatus);
-    if (stepIdx < currentIdx) return "completed";
-    if (stepIdx === currentIdx) return "current";
-    return "upcoming";
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="animate-spin w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full" />
+        <div className="animate-spin w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -106,13 +103,20 @@ export default function DashboardPage() {
 
       <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8">
         <FadeIn duration={400} direction="up">
-          <h1 className="text-xl font-semibold text-gray-900 mb-1">{t.dashboard.title}</h1>
-          <p className="text-sm text-gray-500 mb-6 sm:mb-8">
-            {t.dashboard.welcomeBack} {session?.user?.name || "there"}.
-          </p>
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900 mb-1">{t.dashboard.title}</h1>
+              <p className="text-sm text-gray-500">
+                {t.dashboard.welcomeBack} {session?.user?.name || "there"}.
+              </p>
+            </div>
+            <Link href="/onboarding">
+              <Button size="sm">+ New Application</Button>
+            </Link>
+          </div>
         </FadeIn>
 
-        {!app ? (
+        {applications.length === 0 ? (
           <FadeIn delay={100} duration={400} direction="up">
             <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center hover:shadow-md transition-shadow duration-200">
               <h3 className="text-base font-medium text-gray-900 mb-2">
@@ -127,135 +131,154 @@ export default function DashboardPage() {
             </div>
           </FadeIn>
         ) : (
-          <div className="space-y-4">
-            {/* Status Card */}
-            <FadeIn delay={100} duration={400} direction="up">
-              <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 overflow-hidden hover:shadow-md transition-shadow duration-200">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-3 mb-1 flex-wrap">
-                      <h2 className="text-base font-medium text-gray-900">
-                        {VISA_LABELS[app.visaType || ""] || "Visa Application"}
-                      </h2>
-                      {statusInfo && (
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.color} ${statusInfo.bg}`}
-                        >
-                          {statusInfo.label}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-400">
-                      ID: {app.id.slice(0, 8)}
-                    </p>
-                  </div>
-                  {app.status === "draft" && (
-                    <Link href="/onboarding" className="w-full sm:w-auto">
-                      <Button size="sm" className="w-full sm:w-auto">{t.dashboard.continueApp}</Button>
-                    </Link>
-                  )}
-                </div>
+          <StaggerChildren staggerMs={80} duration={400} direction="up" className="space-y-4">
+            {applications.map((app) => {
+              const statusInfo = STATUS_STYLES[app.status] || STATUS_STYLES.draft;
+              const docs = app.documents || [];
+              const isExpanded = expandedApp === app.id;
 
-                {/* Progress */}
-                <div className="mb-5">
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <span className="text-gray-500">{t.dashboard.progress}</span>
-                    <span className="text-gray-900 font-medium">
-                      {t.dashboard.stepOf.replace("{current}", String(app.currentStep)).replace("{total}", "6")}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-1.5">
-                    <div
-                      className="bg-indigo-600 h-1.5 rounded-full transition-all duration-500"
-                      style={{ width: `${(app.currentStep / 6) * 100}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Details */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-[11px] text-gray-400 mb-0.5">{t.dashboard.created}</p>
-                    <p className="text-sm text-gray-900">{formatDate(app.createdAt)}</p>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-[11px] text-gray-400 mb-0.5">{t.dashboard.updated}</p>
-                    <p className="text-sm text-gray-900">{formatDate(app.updatedAt)}</p>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-[11px] text-gray-400 mb-0.5">{t.dashboard.visaType}</p>
-                    <p className="text-sm text-gray-900 truncate">
-                      {VISA_LABELS[app.visaType || ""] || t.dashboard.notSelected}
-                    </p>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-[11px] text-gray-400 mb-0.5">{t.dashboard.status}</p>
-                    <p className="text-sm text-gray-900">{statusInfo?.label || "Draft"}</p>
-                  </div>
-                </div>
-              </div>
-            </FadeIn>
-
-            {/* Timeline */}
-            <FadeIn delay={200} duration={400} direction="up">
-              <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow duration-200">
-                <h3 className="text-sm font-medium text-gray-900 mb-5">
-                  {t.dashboard.timeline}
-                </h3>
-                <StaggerChildren staggerMs={100} duration={400} direction="up" className="space-y-0">
-                  {timelineStepDefs.map((step, idx) => {
-                    const status = getTimelineStatus(step.status);
-                    return (
-                      <div key={step.status} className="flex gap-3">
-                        <div className="flex flex-col items-center">
-                          <div
-                            className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
-                              status === "completed"
-                                ? "bg-indigo-600 text-white"
-                                : status === "current"
-                                ? "bg-indigo-600 text-white ring-4 ring-indigo-100"
-                                : "bg-gray-100 text-gray-300"
-                            }`}
+              return (
+                <div
+                  key={app.id}
+                  className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200"
+                >
+                  <div className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-3 mb-1 flex-wrap">
+                          <h2 className="text-base font-medium text-gray-900">
+                            {VISA_LABELS[app.visaType || ""] || "Visa Application"}
+                          </h2>
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.color} ${statusInfo.bg}`}
                           >
-                            {status === "completed" ? (
-                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                              </svg>
-                            ) : (
-                              <div
-                                className={`w-1.5 h-1.5 rounded-full ${
-                                  status === "current" ? "bg-white" : "bg-gray-300"
-                                }`}
-                              />
-                            )}
-                          </div>
-                          {idx < timelineStepDefs.length - 1 && (
-                            <div
-                              className={`w-0.5 h-10 transition-colors duration-300 ${
-                                status === "completed" ? "bg-indigo-600" : "bg-gray-100"
-                              }`}
-                            />
-                          )}
+                            {statusInfo.label}
+                          </span>
                         </div>
-                        <div className="pb-10 last:pb-0">
-                          <p
-                            className={`text-sm ${
-                              status === "upcoming" ? "text-gray-300" : "text-gray-900"
-                            }`}
-                          >
-                            {step.label}
+                        <p className="text-xs text-gray-400">
+                          ID: {app.id.slice(0, 8)} &middot; Created {formatDate(app.createdAt)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {app.status === "draft" && (
+                          <Link href={`/onboarding?id=${app.id}`}>
+                            <Button size="sm">{t.dashboard.continueApp}</Button>
+                          </Link>
+                        )}
+                        <button
+                          onClick={() => setExpandedApp(isExpanded ? null : app.id)}
+                          className="text-xs text-gray-400 hover:text-gray-600 transition-colors cursor-pointer px-2 py-1"
+                        >
+                          {isExpanded ? "Less" : "Details"}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Progress bar */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <span className="text-gray-500">{t.dashboard.progress}</span>
+                        <span className="text-gray-900 font-medium">
+                          {t.dashboard.stepOf.replace("{current}", String(app.currentStep)).replace("{total}", "6")}
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-100 rounded-full h-1.5">
+                        <div
+                          className="bg-brand-600 h-1.5 rounded-full transition-all duration-500"
+                          style={{ width: `${(app.currentStep / 6) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Quick info row */}
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="p-2 bg-gray-50 rounded-lg">
+                        <p className="text-[11px] text-gray-400 mb-0.5">{t.dashboard.visaType}</p>
+                        <p className="text-xs text-gray-900 truncate">
+                          {VISA_LABELS[app.visaType || ""] || t.dashboard.notSelected}
+                        </p>
+                      </div>
+                      <div className="p-2 bg-gray-50 rounded-lg">
+                        <p className="text-[11px] text-gray-400 mb-0.5">Step</p>
+                        <p className="text-xs text-gray-900">{app.currentStep} / 6</p>
+                      </div>
+                      <div className="p-2 bg-gray-50 rounded-lg">
+                        <p className="text-[11px] text-gray-400 mb-0.5">Documents</p>
+                        <p className="text-xs text-gray-900">{docs.length} uploaded</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Expanded details */}
+                  {isExpanded && (
+                    <div className="border-t border-gray-100 p-4 sm:p-6 bg-gray-50/50">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4">
+                        <div className="p-3 bg-white rounded-lg border border-gray-100">
+                          <p className="text-[11px] text-gray-400 mb-0.5">{t.dashboard.created}</p>
+                          <p className="text-sm text-gray-900">{formatDate(app.createdAt)}</p>
+                        </div>
+                        <div className="p-3 bg-white rounded-lg border border-gray-100">
+                          <p className="text-[11px] text-gray-400 mb-0.5">{t.dashboard.updated}</p>
+                          <p className="text-sm text-gray-900">{formatDate(app.updatedAt)}</p>
+                        </div>
+                        <div className="p-3 bg-white rounded-lg border border-gray-100">
+                          <p className="text-[11px] text-gray-400 mb-0.5">{t.dashboard.status}</p>
+                          <p className="text-sm text-gray-900">{statusInfo.label}</p>
+                        </div>
+                        <div className="p-3 bg-white rounded-lg border border-gray-100">
+                          <p className="text-[11px] text-gray-400 mb-0.5">{t.dashboard.visaType}</p>
+                          <p className="text-sm text-gray-900 truncate">
+                            {VISA_LABELS[app.visaType || ""] || t.dashboard.notSelected}
                           </p>
-                          {status === "current" && (
-                            <p className="text-xs text-indigo-600 mt-0.5">{t.dashboard.current}</p>
-                          )}
                         </div>
                       </div>
-                    );
-                  })}
-                </StaggerChildren>
-              </div>
-            </FadeIn>
-          </div>
+
+                      {/* Documents list */}
+                      {docs.length > 0 && (
+                        <div>
+                          <h4 className="text-xs font-medium text-gray-500 mb-2">Uploaded Documents</h4>
+                          <div className="space-y-2">
+                            {docs.map((doc) => (
+                              <div
+                                key={doc.id}
+                                className="flex items-center gap-3 p-2 bg-white rounded-lg border border-gray-100"
+                              >
+                                {isImageFile(doc.fileName) ? (
+                                  <img
+                                    src={doc.fileUrl}
+                                    alt={doc.fileName}
+                                    className="w-8 h-8 rounded object-cover flex-shrink-0 border border-gray-200"
+                                  />
+                                ) : (
+                                  <div className="w-8 h-8 rounded bg-accent-100 text-accent-600 flex items-center justify-center flex-shrink-0">
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                  </div>
+                                )}
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-xs text-gray-900 truncate">{doc.fileName}</p>
+                                  <p className="text-[11px] text-gray-400">{doc.documentType.replace(/_/g, " ")}</p>
+                                </div>
+                                <a
+                                  href={doc.fileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-brand-600 hover:text-brand-700 font-medium flex-shrink-0"
+                                >
+                                  View
+                                </a>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </StaggerChildren>
         )}
       </div>
     </div>

@@ -22,10 +22,10 @@ export default function LandingPage() {
       {/* Hero — subtle warm gradient background */}
       <section className="pt-28 sm:pt-32 pb-20 sm:pb-24 px-4 sm:px-8 bg-gradient-to-b from-stone-50/80 via-white to-white relative overflow-hidden">
         {/* Floating gradient orb — very subtle */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-amber-200/15 via-indigo-200/10 to-transparent blur-3xl animate-float-orb pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-brand-200/15 via-accent-200/10 to-transparent blur-3xl animate-float-orb pointer-events-none" />
 
-        {/* Decorative warm accent line */}
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-amber-400/60 rounded-full" />
+        {/* Decorative accent line */}
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-brand-400/40 rounded-full" />
         <div className="max-w-2xl mx-auto text-center relative">
           <FadeIn delay={0} duration={500} direction="up">
             <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 tracking-tight leading-[1.15] mb-6">
@@ -40,7 +40,7 @@ export default function LandingPage() {
           <FadeIn delay={300} duration={500} direction="up">
             <Link
               href="/auth/signup"
-              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 min-h-[48px] bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 active:scale-[0.98] transition-all duration-200 shadow-sm text-base"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 min-h-[48px] bg-brand-600 text-white font-medium rounded-lg hover:bg-brand-700 active:scale-[0.98] transition-all duration-200 shadow-sm text-base"
             >
               {t.landing.cta}
               <svg

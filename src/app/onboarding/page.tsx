@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { Suspense, useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n-context";
 import SlideTransition from "@/components/animations/SlideTransition";
@@ -22,9 +22,10 @@ export type UploadedDoc = {
   status: string;
 };
 
-export default function OnboardingPage() {
+function OnboardingContent() {
   const { data: session } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [applicationId, setApplicationId] = useState<string | null>(null);
@@ -36,28 +37,33 @@ export default function OnboardingPage() {
   const STEP_TITLES = t.onboarding.stepTitles;
 
   useEffect(() => {
+    const idParam = searchParams.get("id");
+
     async function loadApplication() {
       try {
         const res = await fetch("/api/applications");
         const apps = await res.json();
-        if (apps.length > 0) {
-          const app = apps[0];
-          setApplicationId(app.id);
-          setCurrentStep(app.currentStep);
-          setFormData(app.fields || {});
-          if (app.visaType) {
-            setFormData((prev) => ({ ...prev, visaType: app.visaType }));
-          }
-          if (app.documents) {
-            setUploadedDocs(
-              app.documents.map((d: { id: string; fileName: string; fileUrl: string; documentType: string; status: string }) => ({
-                id: d.id,
-                fileName: d.fileName,
-                fileUrl: d.fileUrl,
-                documentType: d.documentType,
-                status: d.status,
-              }))
-            );
+
+        if (idParam) {
+          const app = apps.find((a: { id: string }) => a.id === idParam);
+          if (app) {
+            setApplicationId(app.id);
+            setCurrentStep(app.currentStep);
+            setFormData(app.fields || {});
+            if (app.visaType) {
+              setFormData((prev) => ({ ...prev, visaType: app.visaType }));
+            }
+            if (app.documents) {
+              setUploadedDocs(
+                app.documents.map((d: { id: string; fileName: string; fileUrl: string; documentType: string; status: string }) => ({
+                  id: d.id,
+                  fileName: d.fileName,
+                  fileUrl: d.fileUrl,
+                  documentType: d.documentType,
+                  status: d.status,
+                }))
+              );
+            }
           }
         }
       } catch (err) {
@@ -67,7 +73,7 @@ export default function OnboardingPage() {
       }
     }
     loadApplication();
-  }, []);
+  }, [searchParams]);
 
   const saveStep = useCallback(
     async (step: number, fields: FormData, nextStep?: number) => {
@@ -131,7 +137,7 @@ export default function OnboardingPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="animate-spin w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full" />
+        <div className="animate-spin w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -184,9 +190,9 @@ export default function OnboardingPage() {
                   <div
                     className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 ${
                       isCompleted
-                        ? "bg-indigo-600 text-white"
+                        ? "bg-brand-600 text-white"
                         : isActive
-                        ? "bg-indigo-600 text-white ring-4 ring-indigo-100"
+                        ? "bg-brand-600 text-white ring-4 ring-brand-100"
                         : "bg-gray-100 text-gray-400"
                     }`}
                   >
@@ -200,7 +206,7 @@ export default function OnboardingPage() {
                   </div>
                   <span
                     className={`text-[11px] mt-1.5 hidden sm:block transition-colors duration-200 ${
-                      isActive ? "text-indigo-600 font-medium" : "text-gray-400"
+                      isActive ? "text-brand-600 font-medium" : "text-gray-400"
                     }`}
                   >
                     {title}
@@ -211,7 +217,7 @@ export default function OnboardingPage() {
           </div>
           <div className="w-full bg-gray-100 rounded-full h-1">
             <div
-              className="bg-indigo-600 h-1 rounded-full transition-all duration-500 ease-out"
+              className="bg-brand-600 h-1 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -225,5 +231,19 @@ export default function OnboardingPage() {
         </SlideTransition>
       </div>
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="animate-spin w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full" />
+        </div>
+      }
+    >
+      <OnboardingContent />
+    </Suspense>
   );
 }

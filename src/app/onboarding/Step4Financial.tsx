@@ -121,7 +121,7 @@ export default function Step4Financial({
             id="sourceOfFunds"
             value={fields.sourceOfFunds}
             onChange={(e) => updateField("sourceOfFunds", e.target.value)}
-            className={`w-full px-4 py-3 min-h-[48px] border rounded-lg text-gray-900 text-base transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white ${
+            className={`w-full px-4 py-3 min-h-[48px] border rounded-lg text-gray-900 text-base transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent bg-white ${
               errors.sourceOfFunds
                 ? "border-red-500"
                 : "border-gray-300 hover:border-gray-400"

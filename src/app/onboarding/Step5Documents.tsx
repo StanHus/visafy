@@ -24,6 +24,11 @@ const requiredDocsByVisa: Record<string, string[]> = {
   non_lucrative: ["passport", "photo", "bank_statement", "proof_of_income", "health_insurance", "criminal_record", "accommodation_proof"],
 };
 
+function isImageFile(fileName: string) {
+  const ext = fileName.toLowerCase().split(".").pop();
+  return ext === "jpg" || ext === "jpeg" || ext === "png";
+}
+
 export default function Step5Documents({
   formData,
   applicationId,
@@ -35,6 +40,7 @@ export default function Step5Documents({
 }: Props) {
   const { t } = useLanguage();
   const [uploading, setUploading] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [currentDocType, setCurrentDocType] = useState("");
@@ -82,6 +88,28 @@ export default function Step5Documents({
       setError(t.onboarding.uploadFailed);
     } finally {
       setUploading(null);
+    }
+  };
+
+  const handleDelete = async (docId: string, docType: string) => {
+    if (!applicationId) return;
+    setDeleting(docId);
+    try {
+      const res = await fetch("/api/upload", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ documentId: docId, applicationId }),
+      });
+      if (res.ok) {
+        setUploadedDocs((prev: UploadedDoc[]) => prev.filter((d) => d.id !== docId));
+      } else {
+        const data = await res.json();
+        setError(data.error || "Failed to remove document");
+      }
+    } catch {
+      setError("Failed to remove document");
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -137,61 +165,99 @@ export default function Step5Documents({
           return (
             <div
               key={docType}
-              className={`flex items-center justify-between p-3 sm:p-4 rounded-xl border transition-all ${
+              className={`p-3 sm:p-4 rounded-xl border transition-all ${
                 uploaded
-                  ? "border-green-200 bg-green-50/50"
+                  ? "border-accent-200 bg-accent-50/50"
                   : "border-gray-200 bg-white hover:border-gray-300"
               }`}
             >
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    uploaded
-                      ? "bg-green-100 text-green-600"
-                      : "bg-gray-100 text-gray-400"
-                  }`}
-                >
-                  {uploaded ? (
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  {/* Thumbnail or icon */}
+                  {uploaded && isImageFile(uploaded.fileName) ? (
+                    <img
+                      src={uploaded.fileUrl}
+                      alt={uploaded.fileName}
+                      className="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-gray-200"
+                    />
                   ) : (
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                        uploaded
+                          ? "bg-accent-100 text-accent-600"
+                          : "bg-gray-100 text-gray-400"
+                      }`}
+                    >
+                      {uploaded ? (
+                        uploaded.fileName.toLowerCase().endsWith(".pdf") ? (
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      )}
+                    </div>
                   )}
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">{getDocLabel(docType)}</p>
+                    {uploaded && (
+                      <p className="text-xs text-accent-600 truncate">{uploaded.fileName}</p>
+                    )}
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{getDocLabel(docType)}</p>
+
+                <div className="flex items-center gap-1.5 ml-2 flex-shrink-0">
                   {uploaded && (
-                    <p className="text-xs text-green-600 truncate">{uploaded.fileName}</p>
+                    <>
+                      <a
+                        href={uploaded.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2 py-1.5 rounded-lg text-xs font-medium text-gray-500 hover:text-gray-700 border border-gray-200 hover:border-gray-300 transition-all min-h-[32px] inline-flex items-center"
+                      >
+                        View
+                      </a>
+                      <button
+                        onClick={() => handleDelete(uploaded.id, docType)}
+                        disabled={deleting === uploaded.id}
+                        className="px-2 py-1.5 rounded-lg text-xs font-medium text-red-500 hover:text-red-700 border border-red-200 hover:border-red-300 transition-all cursor-pointer min-h-[32px] disabled:opacity-50"
+                      >
+                        {deleting === uploaded.id ? "..." : "Remove"}
+                      </button>
+                    </>
                   )}
+                  <button
+                    onClick={() => triggerUpload(docType)}
+                    disabled={isUploading}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer min-h-[32px] ${
+                      uploaded
+                        ? "text-gray-500 hover:text-gray-700 border border-gray-200 hover:border-gray-300"
+                        : "text-brand-600 hover:text-brand-700 border border-brand-200 hover:border-brand-300"
+                    } disabled:opacity-50`}
+                  >
+                    {isUploading ? (
+                      <span className="flex items-center gap-1.5">
+                        <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        {t.onboarding.uploading}
+                      </span>
+                    ) : uploaded ? (
+                      t.onboarding.replace
+                    ) : (
+                      t.onboarding.upload
+                    )}
+                  </button>
                 </div>
               </div>
-
-              <button
-                onClick={() => triggerUpload(docType)}
-                disabled={isUploading}
-                className={`ml-2 px-3 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer min-h-[36px] flex-shrink-0 ${
-                  uploaded
-                    ? "text-gray-500 hover:text-gray-700 border border-gray-200 hover:border-gray-300"
-                    : "text-indigo-600 hover:text-indigo-700 border border-indigo-200 hover:border-indigo-300"
-                } disabled:opacity-50`}
-              >
-                {isUploading ? (
-                  <span className="flex items-center gap-1.5">
-                    <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    {t.onboarding.uploading}
-                  </span>
-                ) : uploaded ? (
-                  t.onboarding.replace
-                ) : (
-                  t.onboarding.upload
-                )}
-              </button>
             </div>
           );
         })}

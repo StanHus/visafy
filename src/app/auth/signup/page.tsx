@@ -72,7 +72,7 @@ export default function SignUpPage() {
             {t.auth.haveAccount}{" "}
             <Link
               href="/auth/signin"
-              className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors duration-150"
+              className="text-brand-600 hover:text-brand-700 font-medium transition-colors duration-150"
             >
               {t.auth.signInLink}
             </Link>
