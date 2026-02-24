@@ -1,19 +1,19 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { pgTable, text, integer, timestamp, uuid } from "drizzle-orm/pg-core";
 
-export const users = sqliteTable("users", {
-  id: text("id").primaryKey(),
+export const users = pgTable("users", {
+  id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash"),
   fullName: text("full_name").notNull().default(""),
   phone: text("phone"),
   role: text("role", { enum: ["client", "admin"] }).notNull().default("client"),
-  createdAt: text("created_at").notNull().default(new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().default(new Date().toISOString()),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const applications = sqliteTable("applications", {
-  id: text("id").primaryKey(),
-  userId: text("user_id")
+export const applications = pgTable("applications", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
     .notNull()
     .references(() => users.id),
   visaType: text("visa_type", {
@@ -39,25 +39,25 @@ export const applications = sqliteTable("applications", {
     .notNull()
     .default("draft"),
   currentStep: integer("current_step").notNull().default(1),
-  createdAt: text("created_at").notNull().default(new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().default(new Date().toISOString()),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const applicationData = sqliteTable("application_data", {
-  id: text("id").primaryKey(),
-  applicationId: text("application_id")
+export const applicationData = pgTable("application_data", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  applicationId: uuid("application_id")
     .notNull()
     .references(() => applications.id),
   stepNumber: integer("step_number").notNull(),
   fieldName: text("field_name").notNull(),
   fieldValue: text("field_value").notNull().default(""),
-  createdAt: text("created_at").notNull().default(new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().default(new Date().toISOString()),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const documents = sqliteTable("documents", {
-  id: text("id").primaryKey(),
-  applicationId: text("application_id")
+export const documents = pgTable("documents", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  applicationId: uuid("application_id")
     .notNull()
     .references(() => applications.id),
   documentType: text("document_type", {
@@ -80,7 +80,7 @@ export const documents = sqliteTable("documents", {
     .notNull()
     .default("pending"),
   rejectionReason: text("rejection_reason"),
-  uploadedAt: text("uploaded_at").notNull().default(new Date().toISOString()),
+  uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
 });
 
 export type User = typeof users.$inferSelect;

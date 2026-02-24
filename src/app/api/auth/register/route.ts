@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
-import { v4 as uuidv4 } from "uuid";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -23,11 +22,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const existing = await db
+    const [existing] = await db
       .select()
       .from(users)
-      .where(eq(users.email, email))
-      .get();
+      .where(eq(users.email, email));
 
     if (existing) {
       return NextResponse.json(
@@ -37,20 +35,15 @@ export async function POST(request: Request) {
     }
 
     const passwordHash = await hash(password, 12);
-    const id = uuidv4();
-    const now = new Date().toISOString();
 
-    await db.insert(users).values({
-      id,
+    const [newUser] = await db.insert(users).values({
       email,
       passwordHash,
       fullName,
       role: "client",
-      createdAt: now,
-      updatedAt: now,
-    });
+    }).returning({ id: users.id });
 
-    return NextResponse.json({ success: true, userId: id }, { status: 201 });
+    return NextResponse.json({ success: true, userId: newUser.id }, { status: 201 });
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(

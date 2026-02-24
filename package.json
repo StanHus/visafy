@@ -8,8 +8,7 @@
     "start": "next start",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:seed": "npx tsx src/lib/seed.ts"
+    "db:push": "drizzle-kit push"
   },
   "repository": {
     "type": "git",
@@ -23,8 +22,8 @@
   },
   "homepage": "https://github.com/StanHus/visafy#readme",
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^12.6.2",
     "drizzle-orm": "^0.45.1",
     "next": "^16.1.6",
     "next-auth": "^5.0.0-beta.30",
@@ -36,7 +35,6 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.1",
     "@types/bcryptjs": "^2.4.6",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^25.3.0",
     "@types/react": "^19.2.14",
     "@types/uuid": "^10.0.0",

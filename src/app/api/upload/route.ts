@@ -39,24 +39,19 @@ export async function POST(request: Request) {
     await writeFile(filePath, Buffer.from(bytes));
 
     // Save to database
-    const docId = uuidv4();
-    const now = new Date().toISOString();
-
-    await db.insert(documents).values({
-      id: docId,
+    const [doc] = await db.insert(documents).values({
       applicationId,
       documentType: documentType as typeof documents.$inferInsert.documentType,
       fileUrl: `/uploads/${uniqueName}`,
       fileName: file.name,
       fileSize: file.size,
       status: "pending",
-      uploadedAt: now,
-    });
+    }).returning({ id: documents.id });
 
     return NextResponse.json({
       success: true,
       document: {
-        id: docId,
+        id: doc.id,
         fileName: file.name,
         fileUrl: `/uploads/${uniqueName}`,
         documentType,

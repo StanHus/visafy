@@ -19,14 +19,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const now = new Date().toISOString();
-
   await db
     .update(applications)
     .set({
       status: "submitted",
       currentStep: 6,
-      updatedAt: now,
+      updatedAt: new Date(),
     })
     .where(eq(applications.id, applicationId));
 
