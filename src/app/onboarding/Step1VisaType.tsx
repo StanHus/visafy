@@ -59,15 +59,15 @@ export default function Step1VisaType({ formData, onNext, saving }: Props) {
                 setSelected(id);
                 setError("");
               }}
-              className={`w-full text-left px-4 sm:px-5 py-4 rounded-xl border transition-all duration-200 cursor-pointer min-h-[56px] ${
+              className={`w-full text-left px-4 sm:px-5 py-4 rounded-xl border transition-all duration-200 cursor-pointer min-h-[56px] hover:shadow-sm active:scale-[0.99] ${
                 selected === id
-                  ? "border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600"
-                  : "border-gray-200 hover:border-gray-300 bg-white"
+                  ? "border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600 scale-[1.01]"
+                  : "border-gray-200 hover:border-gray-300 hover:scale-[1.01] bg-white"
               }`}
             >
               <div className="flex items-center gap-3 sm:gap-4">
                 <div
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors duration-200 ${
                     selected === id ? "border-indigo-600" : "border-gray-300"
                   }`}
                 >

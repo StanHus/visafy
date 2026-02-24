@@ -61,7 +61,7 @@ export default function Navbar() {
                   {idx > 0 && <span className="mx-0.5">|</span>}
                   <button
                     onClick={() => setLang(l.code)}
-                    className={`px-1 py-0.5 transition-colors cursor-pointer ${
+                    className={`px-1 py-0.5 transition-all duration-200 cursor-pointer ${
                       lang === l.code
                         ? "text-gray-900 font-semibold underline underline-offset-2"
                         : "hover:text-gray-600"
@@ -77,13 +77,13 @@ export default function Navbar() {
               <>
                 <Link
                   href="/dashboard"
-                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors hidden sm:inline"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150 hidden sm:inline"
                 >
                   {t.nav.dashboard}
                 </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
-                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150 cursor-pointer"
                 >
                   {t.nav.signOut}
                 </button>
@@ -92,7 +92,7 @@ export default function Navbar() {
               <>
                 <Link
                   href="/auth/signin"
-                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150"
                 >
                   {t.nav.signIn}
                 </Link>

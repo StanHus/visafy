@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n-context";
+import SlideTransition from "@/components/animations/SlideTransition";
 import Step1VisaType from "./Step1VisaType";
 import Step2Personal from "./Step2Personal";
 import Step3VisaDetails from "./Step3VisaDetails";
@@ -137,6 +138,25 @@ export default function OnboardingPage() {
 
   const progress = ((currentStep - 1) / (STEP_TITLES.length - 1)) * 100;
 
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return <Step1VisaType formData={formData} onNext={handleNext} saving={saving} />;
+      case 2:
+        return <Step2Personal formData={formData} onNext={handleNext} onBack={handleBack} saving={saving} userEmail={session?.user?.email || ""} />;
+      case 3:
+        return <Step3VisaDetails formData={formData} onNext={handleNext} onBack={handleBack} saving={saving} />;
+      case 4:
+        return <Step4Financial formData={formData} onNext={handleNext} onBack={handleBack} saving={saving} />;
+      case 5:
+        return <Step5Documents formData={formData} applicationId={applicationId} uploadedDocs={uploadedDocs} setUploadedDocs={setUploadedDocs} onNext={handleNext} onBack={handleBack} saving={saving} />;
+      case 6:
+        return <Step6Review formData={formData} uploadedDocs={uploadedDocs} onBack={handleBack} onSubmit={handleSubmit} saving={saving} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white pb-24 md:pb-0">
       {/* Header */}
@@ -179,7 +199,7 @@ export default function OnboardingPage() {
                     )}
                   </div>
                   <span
-                    className={`text-[11px] mt-1.5 hidden sm:block ${
+                    className={`text-[11px] mt-1.5 hidden sm:block transition-colors duration-200 ${
                       isActive ? "text-indigo-600 font-medium" : "text-gray-400"
                     }`}
                   >
@@ -200,26 +220,9 @@ export default function OnboardingPage() {
 
       {/* Step Content */}
       <div className="max-w-2xl mx-auto px-4 py-6 sm:py-10">
-        <div className="animate-fade-in">
-          {currentStep === 1 && (
-            <Step1VisaType formData={formData} onNext={handleNext} saving={saving} />
-          )}
-          {currentStep === 2 && (
-            <Step2Personal formData={formData} onNext={handleNext} onBack={handleBack} saving={saving} userEmail={session?.user?.email || ""} />
-          )}
-          {currentStep === 3 && (
-            <Step3VisaDetails formData={formData} onNext={handleNext} onBack={handleBack} saving={saving} />
-          )}
-          {currentStep === 4 && (
-            <Step4Financial formData={formData} onNext={handleNext} onBack={handleBack} saving={saving} />
-          )}
-          {currentStep === 5 && (
-            <Step5Documents formData={formData} applicationId={applicationId} uploadedDocs={uploadedDocs} setUploadedDocs={setUploadedDocs} onNext={handleNext} onBack={handleBack} saving={saving} />
-          )}
-          {currentStep === 6 && (
-            <Step6Review formData={formData} uploadedDocs={uploadedDocs} onBack={handleBack} onSubmit={handleSubmit} saving={saving} />
-          )}
-        </div>
+        <SlideTransition transitionKey={currentStep}>
+          {renderStep()}
+        </SlideTransition>
       </div>
     </div>
   );

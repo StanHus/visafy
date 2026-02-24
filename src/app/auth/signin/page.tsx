@@ -43,7 +43,7 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm animate-card-enter">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-6">
             <span className="text-xl font-bold text-gray-900 tracking-tight">
@@ -55,7 +55,7 @@ export default function SignInPage() {
             {t.auth.noAccount}{" "}
             <Link
               href="/auth/signup"
-              className="text-indigo-600 hover:text-indigo-700 font-medium"
+              className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors duration-150"
             >
               {t.auth.createOne}
             </Link>
