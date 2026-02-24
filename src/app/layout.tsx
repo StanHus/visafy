@@ -1,0 +1,23 @@
+import type { Metadata } from "next";
+import { SessionProvider } from "next-auth/react";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "Visafy — Spain Immigration Made Simple",
+  description:
+    "Your trusted partner for Spain visa and immigration applications. Start your journey today.",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className="bg-white text-gray-900 antialiased">
+        <SessionProvider>{children}</SessionProvider>
+      </body>
+    </html>
+  );
+}
