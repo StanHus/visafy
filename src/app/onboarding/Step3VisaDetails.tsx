@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { VISA_LABELS } from "@/lib/constants";
 import type { FormData } from "./page";
 
 interface Props {
@@ -100,21 +101,12 @@ export default function Step3VisaDetails({
     }
   };
 
-  const visaLabels: Record<string, string> = {
-    work_visa: "Work Visa",
-    golden_visa: "Golden Visa",
-    student_visa: "Student Visa",
-    digital_nomad: "Digital Nomad Visa",
-    family_reunification: "Family Reunification",
-    non_lucrative: "Non-Lucrative Visa",
-  };
-
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">
-        {visaLabels[visaType]} Details
+      <h2 className="text-xl font-semibold text-gray-900 mb-1">
+        {VISA_LABELS[visaType]} details
       </h2>
-      <p className="text-gray-600 mb-8">
+      <p className="text-sm text-gray-500 mb-8">
         Provide specific information required for your visa type.
       </p>
 
@@ -135,12 +127,9 @@ export default function Step3VisaDetails({
 
       <div className="flex justify-between mt-8">
         <Button variant="outline" onClick={onBack}>
-          <svg className="mr-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
           Back
         </Button>
-        <Button onClick={handleNext} loading={saving} size="lg">
+        <Button onClick={handleNext} loading={saving}>
           Continue
           <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

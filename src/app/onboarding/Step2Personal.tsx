@@ -67,12 +67,11 @@ export default function Step2Personal({
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">
-        Personal Information
+      <h2 className="text-xl font-semibold text-gray-900 mb-1">
+        Personal information
       </h2>
-      <p className="text-gray-600 mb-8">
-        Please provide your personal details exactly as they appear on your
-        passport.
+      <p className="text-sm text-gray-500 mb-8">
+        Enter your details as they appear on your passport.
       </p>
 
       <div className="space-y-5">
@@ -165,12 +164,9 @@ export default function Step2Personal({
 
       <div className="flex justify-between mt-8">
         <Button variant="outline" onClick={onBack}>
-          <svg className="mr-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
           Back
         </Button>
-        <Button onClick={handleNext} loading={saving} size="lg">
+        <Button onClick={handleNext} loading={saving}>
           Continue
           <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

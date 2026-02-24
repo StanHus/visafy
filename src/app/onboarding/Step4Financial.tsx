@@ -57,12 +57,11 @@ export default function Step4Financial({
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">
-        Financial Information
+      <h2 className="text-xl font-semibold text-gray-900 mb-1">
+        Financial information
       </h2>
-      <p className="text-gray-600 mb-8">
-        Provide details about your financial situation. This is required for all
-        visa applications.
+      <p className="text-sm text-gray-500 mb-8">
+        Provide details about your financial situation.
       </p>
 
       <div className="space-y-5">
@@ -117,7 +116,7 @@ export default function Step4Financial({
             id="sourceOfFunds"
             value={fields.sourceOfFunds}
             onChange={(e) => updateField("sourceOfFunds", e.target.value)}
-            className={`w-full px-4 py-2.5 border rounded-lg text-gray-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white ${
+            className={`w-full px-4 py-2.5 border rounded-lg text-gray-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white ${
               errors.sourceOfFunds
                 ? "border-red-500"
                 : "border-gray-300 hover:border-gray-400"
@@ -140,12 +139,9 @@ export default function Step4Financial({
 
       <div className="flex justify-between mt-8">
         <Button variant="outline" onClick={onBack}>
-          <svg className="mr-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
           Back
         </Button>
-        <Button onClick={handleNext} loading={saving} size="lg">
+        <Button onClick={handleNext} loading={saving}>
           Continue
           <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

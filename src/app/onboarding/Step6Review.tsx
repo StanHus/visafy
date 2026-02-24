@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Button from "@/components/ui/Button";
+import { VISA_LABELS, FUND_SOURCE_LABELS } from "@/lib/constants";
 import type { FormData, UploadedDoc } from "./page";
 
 interface Props {
@@ -11,25 +12,6 @@ interface Props {
   onSubmit: () => void;
   saving: boolean;
 }
-
-const visaLabels: Record<string, string> = {
-  work_visa: "Work Visa",
-  golden_visa: "Golden Visa",
-  student_visa: "Student Visa",
-  digital_nomad: "Digital Nomad Visa",
-  family_reunification: "Family Reunification",
-  non_lucrative: "Non-Lucrative Visa",
-};
-
-const fundSourceLabels: Record<string, string> = {
-  employment: "Employment / Salary",
-  self_employment: "Self-Employment / Business",
-  investments: "Investments / Dividends",
-  savings: "Savings",
-  pension: "Pension / Retirement",
-  family_support: "Family Support",
-  other: "Other",
-};
 
 export default function Step6Review({
   formData,
@@ -59,7 +41,7 @@ export default function Step6Review({
   }) => (
     <div className="border border-gray-200 rounded-xl overflow-hidden mb-4">
       <div className="bg-gray-50 px-5 py-3 border-b border-gray-200">
-        <h3 className="font-semibold text-gray-900">{title}</h3>
+        <h3 className="text-sm font-medium text-gray-900">{title}</h3>
       </div>
       <div className="px-5 py-4">{children}</div>
     </div>
@@ -67,19 +49,18 @@ export default function Step6Review({
 
   const Field = ({ label, value }: { label: string; value: string }) => (
     <div className="flex flex-col sm:flex-row sm:items-center py-2 border-b border-gray-100 last:border-0">
-      <span className="text-sm text-gray-500 sm:w-48 shrink-0">{label}</span>
-      <span className="text-sm text-gray-900 font-medium">{value || "—"}</span>
+      <span className="text-xs text-gray-500 sm:w-44 shrink-0">{label}</span>
+      <span className="text-sm text-gray-900">{value || "\u2014"}</span>
     </div>
   );
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">
-        Review & Submit
+      <h2 className="text-xl font-semibold text-gray-900 mb-1">
+        Review & submit
       </h2>
-      <p className="text-gray-600 mb-8">
-        Please review all the information below before submitting your
-        application.
+      <p className="text-sm text-gray-500 mb-8">
+        Review your information before submitting.
       </p>
 
       {error && (
@@ -89,7 +70,7 @@ export default function Step6Review({
       )}
 
       <Section title="Visa Type">
-        <Field label="Selected Visa" value={visaLabels[formData.visaType] || formData.visaType} />
+        <Field label="Selected Visa" value={VISA_LABELS[formData.visaType] || formData.visaType} />
       </Section>
 
       <Section title="Personal Information">
@@ -105,22 +86,16 @@ export default function Step6Review({
       </Section>
 
       <Section title="Financial Information">
-        <Field label="Annual Income" value={formData.annualIncome ? `€${formData.annualIncome}` : ""} />
-        <Field
-          label="Monthly Income"
-          value={formData.monthlyIncome ? `€${formData.monthlyIncome}` : ""}
-        />
+        <Field label="Annual Income" value={formData.annualIncome ? `\u20AC${formData.annualIncome}` : ""} />
+        <Field label="Monthly Income" value={formData.monthlyIncome ? `\u20AC${formData.monthlyIncome}` : ""} />
         <Field label="Bank Name" value={formData.bankName} />
         <Field label="Bank Country" value={formData.bankAccountCountry} />
-        <Field
-          label="Source of Funds"
-          value={fundSourceLabels[formData.sourceOfFunds] || formData.sourceOfFunds}
-        />
+        <Field label="Source of Funds" value={FUND_SOURCE_LABELS[formData.sourceOfFunds] || formData.sourceOfFunds} />
       </Section>
 
       <Section title="Documents">
         {uploadedDocs.length === 0 ? (
-          <p className="text-sm text-gray-500">No documents uploaded yet.</p>
+          <p className="text-sm text-gray-400">No documents uploaded yet.</p>
         ) : (
           <div className="space-y-2">
             {uploadedDocs.map((doc) => (
@@ -128,16 +103,14 @@ export default function Step6Review({
                 key={doc.id}
                 className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0"
               >
-                <div className="w-8 h-8 rounded bg-green-100 text-green-600 flex items-center justify-center">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-6 h-6 rounded bg-green-100 text-green-600 flex items-center justify-center">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    {doc.fileName}
-                  </p>
-                  <p className="text-xs text-gray-500">{doc.documentType.replace(/_/g, " ")}</p>
+                  <p className="text-sm text-gray-900">{doc.fileName}</p>
+                  <p className="text-xs text-gray-400">{doc.documentType.replace(/_/g, " ")}</p>
                 </div>
               </div>
             ))}
@@ -146,7 +119,7 @@ export default function Step6Review({
       </Section>
 
       {/* Terms */}
-      <div className="mt-6 p-5 bg-gray-50 rounded-xl border border-gray-200">
+      <div className="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
         <label className="flex items-start gap-3 cursor-pointer">
           <input
             type="checkbox"
@@ -155,27 +128,24 @@ export default function Step6Review({
               setAgreed(e.target.checked);
               if (e.target.checked) setError("");
             }}
-            className="mt-0.5 w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer"
+            className="mt-0.5 w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
           />
-          <span className="text-sm text-gray-600">
+          <span className="text-xs text-gray-500 leading-relaxed">
             I confirm that all the information provided is accurate and complete.
             I understand that providing false information may result in my
             application being rejected. I agree to the{" "}
-            <span className="text-orange-500 font-medium">Terms of Service</span>{" "}
+            <span className="text-indigo-600 font-medium">Terms of Service</span>{" "}
             and{" "}
-            <span className="text-orange-500 font-medium">Privacy Policy</span>.
+            <span className="text-indigo-600 font-medium">Privacy Policy</span>.
           </span>
         </label>
       </div>
 
       <div className="flex justify-between mt-8">
         <Button variant="outline" onClick={onBack}>
-          <svg className="mr-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
           Back
         </Button>
-        <Button onClick={handleSubmit} loading={saving} size="lg">
+        <Button onClick={handleSubmit} loading={saving}>
           Submit Application
           <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

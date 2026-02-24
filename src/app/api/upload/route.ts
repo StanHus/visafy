@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { v4 as uuidv4 } from "uuid";
+import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { documents } from "@/lib/db/schema";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { applications, documents } from "@/lib/db/schema";
+import { eq, and } from "drizzle-orm";
+import { ALLOWED_UPLOAD_EXTENSIONS, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from "@/lib/constants";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -25,24 +25,50 @@ export async function POST(request: Request) {
       );
     }
 
-    // Ensure uploads directory exists
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
+    // Fix C3: verify application ownership
+    const [app] = await db
+      .select({ id: applications.id })
+      .from(applications)
+      .where(and(eq(applications.id, applicationId), eq(applications.userId, session.user.id)));
 
-    // Generate unique filename
-    const ext = path.extname(file.name);
-    const uniqueName = `${uuidv4()}${ext}`;
-    const filePath = path.join(uploadDir, uniqueName);
+    if (!app) {
+      return NextResponse.json({ error: "Application not found" }, { status: 404 });
+    }
 
-    // Write file
-    const bytes = await file.arrayBuffer();
-    await writeFile(filePath, Buffer.from(bytes));
+    // Fix C6: file size validation
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: "File too large. Maximum size is 10MB." },
+        { status: 413 }
+      );
+    }
+
+    // Fix C7: file type validation
+    const ext = "." + (file.name.split(".").pop() || "").toLowerCase();
+    if (!ALLOWED_UPLOAD_EXTENSIONS.includes(ext)) {
+      return NextResponse.json(
+        { error: "File type not allowed. Only PDF, JPG, and PNG files are accepted." },
+        { status: 400 }
+      );
+    }
+
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        { error: "File type not allowed. Only PDF, JPG, and PNG files are accepted." },
+        { status: 400 }
+      );
+    }
+
+    // Fix C4/C5: use Vercel Blob storage instead of local filesystem
+    const blob = await put(`documents/${applicationId}/${crypto.randomUUID()}${ext}`, file, {
+      access: "public",
+    });
 
     // Save to database
     const [doc] = await db.insert(documents).values({
       applicationId,
       documentType: documentType as typeof documents.$inferInsert.documentType,
-      fileUrl: `/uploads/${uniqueName}`,
+      fileUrl: blob.url,
       fileName: file.name,
       fileSize: file.size,
       status: "pending",
@@ -53,7 +79,7 @@ export async function POST(request: Request) {
       document: {
         id: doc.id,
         fileName: file.name,
-        fileUrl: `/uploads/${uniqueName}`,
+        fileUrl: blob.url,
         documentType,
         status: "pending",
       },

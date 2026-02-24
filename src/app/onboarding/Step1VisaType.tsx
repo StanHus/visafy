@@ -5,48 +5,12 @@ import Button from "@/components/ui/Button";
 import type { FormData } from "./page";
 
 const visaTypes = [
-  {
-    id: "work_visa",
-    title: "Work Visa",
-    description: "Employment-based immigration with a job offer in Spain",
-    icon: "💼",
-    requirements: "Job offer, employer sponsorship, qualifications",
-  },
-  {
-    id: "golden_visa",
-    title: "Golden Visa",
-    description: "Residency through significant investment in Spain",
-    icon: "🏆",
-    requirements: "Min. €500K real estate or €1M financial investment",
-  },
-  {
-    id: "student_visa",
-    title: "Student Visa",
-    description: "Study at Spanish educational institutions",
-    icon: "🎓",
-    requirements: "University acceptance, financial proof, insurance",
-  },
-  {
-    id: "digital_nomad",
-    title: "Digital Nomad Visa",
-    description: "Remote work for foreign companies from Spain",
-    icon: "💻",
-    requirements: "Remote employment/freelance, min. income proof",
-  },
-  {
-    id: "family_reunification",
-    title: "Family Reunification",
-    description: "Join family members who are legal residents",
-    icon: "👨‍👩‍👧‍👦",
-    requirements: "Family member with legal residency, proof of relationship",
-  },
-  {
-    id: "non_lucrative",
-    title: "Non-Lucrative Visa",
-    description: "Live in Spain with passive income or savings",
-    icon: "🌴",
-    requirements: "Sufficient passive income, health insurance, no work",
-  },
+  { id: "work_visa", title: "Work Visa", description: "Employment-based immigration with a job offer in Spain" },
+  { id: "golden_visa", title: "Golden Visa", description: "Residency through significant investment in Spain" },
+  { id: "student_visa", title: "Student Visa", description: "Study at Spanish educational institutions" },
+  { id: "digital_nomad", title: "Digital Nomad Visa", description: "Remote work for foreign companies from Spain" },
+  { id: "family_reunification", title: "Family Reunification", description: "Join family members who are legal residents" },
+  { id: "non_lucrative", title: "Non-Lucrative Visa", description: "Live in Spain with passive income or savings" },
 ];
 
 interface Props {
@@ -70,12 +34,11 @@ export default function Step1VisaType({ formData, onNext, saving }: Props) {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">
-        Select Your Visa Type
+      <h2 className="text-xl font-semibold text-gray-900 mb-1">
+        Select your visa type
       </h2>
-      <p className="text-gray-600 mb-8">
-        Choose the visa category that best fits your situation. This will
-        customize the rest of your application.
+      <p className="text-sm text-gray-500 mb-8">
+        Choose the visa category that fits your situation.
       </p>
 
       {error && (
@@ -84,7 +47,7 @@ export default function Step1VisaType({ formData, onNext, saving }: Props) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+      <div className="space-y-3 mb-8">
         {visaTypes.map((visa) => (
           <button
             key={visa.id}
@@ -92,25 +55,35 @@ export default function Step1VisaType({ formData, onNext, saving }: Props) {
               setSelected(visa.id);
               setError("");
             }}
-            className={`text-left p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer ${
+            className={`w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 cursor-pointer ${
               selected === visa.id
-                ? "border-orange-500 bg-orange-50 shadow-sm"
+                ? "border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600"
                 : "border-gray-200 hover:border-gray-300 bg-white"
             }`}
           >
-            <div className="text-2xl mb-3">{visa.icon}</div>
-            <h3 className="font-semibold text-gray-900 mb-1">{visa.title}</h3>
-            <p className="text-sm text-gray-600 mb-3">{visa.description}</p>
-            <p className="text-xs text-gray-400">
-              <span className="font-medium">Key requirements:</span>{" "}
-              {visa.requirements}
-            </p>
+            <div className="flex items-center gap-4">
+              <div
+                className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                  selected === visa.id
+                    ? "border-indigo-600"
+                    : "border-gray-300"
+                }`}
+              >
+                {selected === visa.id && (
+                  <div className="w-2 h-2 rounded-full bg-indigo-600" />
+                )}
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-900">{visa.title}</h3>
+                <p className="text-xs text-gray-500 mt-0.5">{visa.description}</p>
+              </div>
+            </div>
           </button>
         ))}
       </div>
 
       <div className="flex justify-end">
-        <Button onClick={handleNext} loading={saving} size="lg">
+        <Button onClick={handleNext} loading={saving}>
           Continue
           <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

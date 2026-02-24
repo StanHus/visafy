@@ -40,61 +40,37 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gray-900 p-12 flex-col justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">V</span>
-          </div>
-          <span className="text-xl font-bold text-white">Visafy</span>
-        </Link>
-        <div>
-          <h2 className="text-4xl font-bold text-white mb-4">
-            Welcome back
-          </h2>
-          <p className="text-gray-400 text-lg">
-            Sign in to continue your immigration journey to Spain.
-          </p>
-        </div>
-        <p className="text-gray-500 text-sm">
-          &copy; {new Date().getFullYear()} Visafy
-        </p>
-      </div>
-
-      {/* Right Panel */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md">
-          <div className="lg:hidden mb-8">
-            <Link href="/" className="flex items-center gap-2 mb-8">
-              <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">V</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">Visafy</span>
-            </Link>
-          </div>
-
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Sign in</h1>
-          <p className="text-gray-600 mb-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-block mb-6">
+            <span className="text-xl font-bold text-gray-900 tracking-tight">
+              Visafy
+            </span>
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Sign in</h1>
+          <p className="text-sm text-gray-500">
             Don&apos;t have an account?{" "}
             <Link
               href="/auth/signup"
-              className="text-orange-500 hover:text-orange-600 font-medium"
+              className="text-indigo-600 hover:text-indigo-700 font-medium"
             >
               Create one
             </Link>
           </p>
+        </div>
 
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
           {error && (
-            <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+            <div className="mb-5 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               id="email"
-              label="Email address"
+              label="Email"
               type="email"
               placeholder="you@example.com"
               value={email}

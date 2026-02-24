@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Step1VisaType from "./Step1VisaType";
 import Step2Personal from "./Step2Personal";
 import Step3VisaDetails from "./Step3VisaDetails";
@@ -12,8 +13,8 @@ import Step6Review from "./Step6Review";
 
 const STEP_TITLES = [
   "Visa Type",
-  "Personal Info",
-  "Visa Details",
+  "Personal",
+  "Details",
   "Financial",
   "Documents",
   "Review",
@@ -38,7 +39,6 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Load existing application
   useEffect(() => {
     async function loadApplication() {
       try {
@@ -51,6 +51,17 @@ export default function OnboardingPage() {
           setFormData(app.fields || {});
           if (app.visaType) {
             setFormData((prev) => ({ ...prev, visaType: app.visaType }));
+          }
+          if (app.documents) {
+            setUploadedDocs(
+              app.documents.map((d: { id: string; fileName: string; fileUrl: string; documentType: string; status: string }) => ({
+                id: d.id,
+                fileName: d.fileName,
+                fileUrl: d.fileUrl,
+                documentType: d.documentType,
+                status: d.status,
+              }))
+            );
           }
         }
       } catch (err) {
@@ -123,53 +134,49 @@ export default function OnboardingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full" />
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="animate-spin w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full" />
       </div>
     );
   }
 
+  const progress = ((currentStep - 1) / (STEP_TITLES.length - 1)) * 100;
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">V</span>
-            </div>
-            <span className="text-xl font-bold text-gray-900">Visafy</span>
-          </div>
-          <span className="text-sm text-gray-500">
+      <div className="border-b border-gray-100">
+        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href="/" className="text-lg font-bold text-gray-900 tracking-tight">
+            Visafy
+          </Link>
+          <span className="text-sm text-gray-400">
             {session?.user?.email}
           </span>
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-3xl mx-auto px-4 py-6">
+      {/* Progress */}
+      <div className="border-b border-gray-100">
+        <div className="max-w-2xl mx-auto px-4 py-5">
           <div className="flex items-center justify-between mb-3">
             {STEP_TITLES.map((title, idx) => {
               const stepNum = idx + 1;
               const isActive = stepNum === currentStep;
               const isCompleted = stepNum < currentStep;
               return (
-                <div
-                  key={title}
-                  className="flex flex-col items-center flex-1"
-                >
+                <div key={title} className="flex flex-col items-center flex-1">
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
+                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 ${
                       isCompleted
-                        ? "bg-orange-500 text-white"
+                        ? "bg-indigo-600 text-white"
                         : isActive
-                        ? "bg-orange-500 text-white ring-4 ring-orange-100"
-                        : "bg-gray-200 text-gray-500"
+                        ? "bg-indigo-600 text-white ring-4 ring-indigo-100"
+                        : "bg-gray-100 text-gray-400"
                     }`}
                   >
                     {isCompleted ? (
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     ) : (
@@ -177,8 +184,8 @@ export default function OnboardingPage() {
                     )}
                   </div>
                   <span
-                    className={`text-xs mt-1.5 hidden sm:block ${
-                      isActive ? "text-orange-500 font-medium" : "text-gray-500"
+                    className={`text-[11px] mt-1.5 hidden sm:block ${
+                      isActive ? "text-indigo-600 font-medium" : "text-gray-400"
                     }`}
                   >
                     {title}
@@ -187,71 +194,35 @@ export default function OnboardingPage() {
               );
             })}
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-1.5">
+          <div className="w-full bg-gray-100 rounded-full h-1">
             <div
-              className="bg-orange-500 h-1.5 rounded-full transition-all duration-500 ease-out"
-              style={{
-                width: `${((currentStep - 1) / (STEP_TITLES.length - 1)) * 100}%`,
-              }}
+              className="bg-indigo-600 h-1 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${progress}%` }}
             />
           </div>
         </div>
       </div>
 
       {/* Step Content */}
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-2xl mx-auto px-4 py-10">
         <div className="animate-fade-in">
           {currentStep === 1 && (
-            <Step1VisaType
-              formData={formData}
-              onNext={handleNext}
-              saving={saving}
-            />
+            <Step1VisaType formData={formData} onNext={handleNext} saving={saving} />
           )}
           {currentStep === 2 && (
-            <Step2Personal
-              formData={formData}
-              onNext={handleNext}
-              onBack={handleBack}
-              saving={saving}
-              userEmail={session?.user?.email || ""}
-            />
+            <Step2Personal formData={formData} onNext={handleNext} onBack={handleBack} saving={saving} userEmail={session?.user?.email || ""} />
           )}
           {currentStep === 3 && (
-            <Step3VisaDetails
-              formData={formData}
-              onNext={handleNext}
-              onBack={handleBack}
-              saving={saving}
-            />
+            <Step3VisaDetails formData={formData} onNext={handleNext} onBack={handleBack} saving={saving} />
           )}
           {currentStep === 4 && (
-            <Step4Financial
-              formData={formData}
-              onNext={handleNext}
-              onBack={handleBack}
-              saving={saving}
-            />
+            <Step4Financial formData={formData} onNext={handleNext} onBack={handleBack} saving={saving} />
           )}
           {currentStep === 5 && (
-            <Step5Documents
-              formData={formData}
-              applicationId={applicationId}
-              uploadedDocs={uploadedDocs}
-              setUploadedDocs={setUploadedDocs}
-              onNext={handleNext}
-              onBack={handleBack}
-              saving={saving}
-            />
+            <Step5Documents formData={formData} applicationId={applicationId} uploadedDocs={uploadedDocs} setUploadedDocs={setUploadedDocs} onNext={handleNext} onBack={handleBack} saving={saving} />
           )}
           {currentStep === 6 && (
-            <Step6Review
-              formData={formData}
-              uploadedDocs={uploadedDocs}
-              onBack={handleBack}
-              onSubmit={handleSubmit}
-              saving={saving}
-            />
+            <Step6Review formData={formData} uploadedDocs={uploadedDocs} onBack={handleBack} onSubmit={handleSubmit} saving={saving} />
           )}
         </div>
       </div>
