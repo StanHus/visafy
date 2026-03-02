@@ -73,6 +73,20 @@ export default function Navbar() {
               ))}
             </div>
 
+            {/* Captains & Rentals links */}
+            <Link
+              href="/captains"
+              className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150 hidden sm:inline"
+            >
+              {t.nav2.captains}
+            </Link>
+            <Link
+              href="/rentals"
+              className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150 hidden sm:inline"
+            >
+              {t.nav2.rentals}
+            </Link>
+
             {session ? (
               <>
                 {(session.user as { role?: string })?.role === "admin" && (

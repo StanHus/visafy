@@ -115,32 +115,49 @@ export async function POST(request: Request) {
       }
     }
 
-    // Save field data for this step
+    // Save field data for this step (batch upsert for atomicity)
     if (fields && step) {
-      for (const [fieldName, fieldValue] of Object.entries(fields)) {
-        const [existing] = await db
-          .select()
+      const fieldNames = Object.keys(fields);
+      if (fieldNames.length > 0) {
+        // Fetch all existing fields for this app in one query
+        const existing = await db
+          .select({ id: applicationData.id, fieldName: applicationData.fieldName })
           .from(applicationData)
           .where(
             and(
               eq(applicationData.applicationId, appId),
-              eq(applicationData.fieldName, fieldName)
+              inArray(applicationData.fieldName, fieldNames)
             )
           );
+        const existingMap = new Map(existing.map((e) => [e.fieldName, e.id]));
 
-        if (existing) {
-          await db
-            .update(applicationData)
-            .set({ fieldValue: fieldValue as string, updatedAt: new Date() })
-            .where(eq(applicationData.id, existing.id));
-        } else {
-          await db.insert(applicationData).values({
-            applicationId: appId,
-            stepNumber: step,
-            fieldName,
-            fieldValue: fieldValue as string,
-          });
+        // Batch updates and inserts
+        const updates = [];
+        const inserts = [];
+        for (const [fieldName, fieldValue] of Object.entries(fields)) {
+          const existingId = existingMap.get(fieldName);
+          if (existingId) {
+            updates.push(
+              db
+                .update(applicationData)
+                .set({ fieldValue: fieldValue as string, updatedAt: new Date() })
+                .where(eq(applicationData.id, existingId))
+            );
+          } else {
+            inserts.push({
+              applicationId: appId,
+              stepNumber: step,
+              fieldName,
+              fieldValue: fieldValue as string,
+            });
+          }
         }
+
+        // Execute all updates in parallel, insert all new rows in one query
+        await Promise.all([
+          ...updates,
+          ...(inserts.length > 0 ? [db.insert(applicationData).values(inserts)] : []),
+        ]);
       }
     }
 

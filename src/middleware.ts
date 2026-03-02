@@ -6,7 +6,15 @@ export default auth((req) => {
   const { pathname } = req.nextUrl;
 
   // Protected routes (require login)
-  const protectedPaths = ["/onboarding", "/dashboard", "/admin"];
+  const protectedPaths = [
+    "/onboarding",
+    "/dashboard",
+    "/admin",
+    "/captains/register",
+    "/captains/dashboard",
+    "/rentals/list",
+    "/rentals/dashboard",
+  ];
   const isProtected = protectedPaths.some((path) => pathname.startsWith(path));
 
   if (isProtected && !isLoggedIn) {
