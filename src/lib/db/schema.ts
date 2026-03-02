@@ -1,4 +1,4 @@
-import { pgTable, text, integer, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, timestamp, uuid, boolean } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -6,7 +6,7 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash"),
   fullName: text("full_name").notNull().default(""),
   phone: text("phone"),
-  role: text("role", { enum: ["client", "admin"] }).notNull().default("client"),
+  role: text("role", { enum: ["client", "captain", "landlord", "admin"] }).notNull().default("client"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -83,7 +83,84 @@ export const documents = pgTable("documents", {
   uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
 });
 
+// Admin notes on applications
+export const adminNotes = pgTable("admin_notes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  applicationId: uuid("application_id")
+    .notNull()
+    .references(() => applications.id),
+  adminId: uuid("admin_id")
+    .notNull()
+    .references(() => users.id),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Status history tracking
+export const statusHistory = pgTable("status_history", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  applicationId: uuid("application_id")
+    .notNull()
+    .references(() => applications.id),
+  oldStatus: text("old_status"),
+  newStatus: text("new_status").notNull(),
+  changedBy: uuid("changed_by").references(() => users.id),
+  note: text("note"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Payments
+export const payments = pgTable("payments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  applicationId: uuid("application_id")
+    .notNull()
+    .references(() => applications.id),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id),
+  stripePaymentId: text("stripe_payment_id"),
+  stripeCheckoutSessionId: text("stripe_checkout_session_id"),
+  amount: integer("amount").notNull(), // cents
+  currency: text("currency").notNull().default("eur"),
+  status: text("status", { enum: ["pending", "completed", "failed", "refunded"] })
+    .notNull()
+    .default("pending"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Notifications
+export const notifications = pgTable("notifications", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id),
+  applicationId: uuid("application_id").references(() => applications.id),
+  type: text("type", { enum: ["status_change", "note_added", "payment", "document_review", "message"] }).notNull(),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  read: boolean("read").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Messages between admin and applicant
+export const messages = pgTable("messages", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  applicationId: uuid("application_id")
+    .notNull()
+    .references(() => applications.id),
+  senderId: uuid("sender_id")
+    .notNull()
+    .references(() => users.id),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export type User = typeof users.$inferSelect;
 export type Application = typeof applications.$inferSelect;
 export type ApplicationData = typeof applicationData.$inferSelect;
 export type Document = typeof documents.$inferSelect;
+export type AdminNote = typeof adminNotes.$inferSelect;
+export type StatusHistory = typeof statusHistory.$inferSelect;
+export type Payment = typeof payments.$inferSelect;
+export type Notification = typeof notifications.$inferSelect;
+export type Message = typeof messages.$inferSelect;
