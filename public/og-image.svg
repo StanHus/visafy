@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0eff8"/>
+      <stop offset="100%" style="stop-color:#ffffff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="900" cy="200" r="250" fill="#c1bbe1" opacity="0.15"/>
+  <circle cx="300" cy="450" r="200" fill="#a8c1b5" opacity="0.1"/>
+  <text x="600" y="260" font-family="system-ui, -apple-system, sans-serif" font-size="80" font-weight="700" fill="#1a1a1a" text-anchor="middle" letter-spacing="-2">KORE</text>
+  <text x="600" y="340" font-family="system-ui, -apple-system, sans-serif" font-size="32" fill="#6b7280" text-anchor="middle">Spain Immigration Made Simple</text>
+  <line x1="540" y1="380" x2="660" y2="380" stroke="#302a7e" stroke-width="3" stroke-linecap="round"/>
+  <text x="600" y="430" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#9ca3af" text-anchor="middle">Visa Processing · Local Guides · Housing</text>
+  <text x="600" y="570" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#302a7e" text-anchor="middle">kore.expanova.io</text>
+</svg>

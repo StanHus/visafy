@@ -101,6 +101,20 @@ export default function LandingPage() {
           <span className="text-sm font-semibold text-gray-900 tracking-tight">
             KORE
           </span>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/terms"
+              className="text-sm text-gray-400 hover:text-gray-600 transition-colors duration-150"
+            >
+              {t.footer.terms}
+            </Link>
+            <Link
+              href="/privacy"
+              className="text-sm text-gray-400 hover:text-gray-600 transition-colors duration-150"
+            >
+              {t.footer.privacy}
+            </Link>
+          </div>
           <p className="text-sm text-gray-400">
             &copy; {new Date().getFullYear()} KORE. {t.landing.footerRights}
           </p>

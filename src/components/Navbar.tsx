@@ -73,7 +73,7 @@ export default function Navbar() {
               ))}
             </div>
 
-            {/* Captains & Rentals links */}
+            {/* Captains, Rentals & About links */}
             <Link
               href="/captains"
               className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150 hidden sm:inline"
@@ -85,6 +85,12 @@ export default function Navbar() {
               className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150 hidden sm:inline"
             >
               {t.nav2.rentals}
+            </Link>
+            <Link
+              href="/about"
+              className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150 hidden sm:inline"
+            >
+              {t.nav2.about}
             </Link>
 
             {session ? (

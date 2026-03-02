@@ -612,6 +612,63 @@ const en = {
   nav2: {
     captains: "Captains",
     rentals: "Rentals",
+    about: "About",
+  },
+
+  // Footer
+  footer: {
+    terms: "Terms of Service",
+    privacy: "Privacy Policy",
+  },
+
+  // About page
+  about: {
+    title: "About KORE",
+    subtitle: "Making relocation to Spain simple, transparent, and human.",
+    storyTitle: "Our Story",
+    storyP1:
+      "KORE was founded by a group of expats who went through the painful Spanish immigration process themselves. We dealt with confusing paperwork, language barriers, and the overwhelming feeling of navigating a foreign bureaucracy alone.",
+    storyP2:
+      "We built KORE because we believe no one should have to figure it out on their own. Our platform combines technology with real human support to make relocating to Spain as smooth as possible.",
+    missionTitle: "Our Mission",
+    missionText:
+      "Make relocating to Spain simple, transparent, and human. We take the complexity out of immigration so you can focus on starting your new life.",
+    pillarsTitle: "The Three Pillars of KORE",
+    pillar1Title: "Visa Processing",
+    pillar1Desc:
+      "Guided applications for every visa type — from Digital Nomad to Golden Visa. We walk you through every step and handle the paperwork.",
+    pillar2Title: "Local Guides (Captains)",
+    pillar2Desc:
+      "Connect with verified local experts who have been through the process themselves. Get personalized advice on housing, legal matters, and cultural adjustment.",
+    pillar3Title: "Housing",
+    pillar3Desc:
+      "Find visa-friendly housing through our verified rental marketplace. No more scams, no more language barriers — just a home waiting for you.",
+    ctaTitle: "Ready to start your journey?",
+    ctaButton: "Get Started",
+  },
+
+  // Terms of Service
+  terms: {
+    title: "Terms of Service",
+    lastUpdated: "Last updated",
+  },
+
+  // Privacy Policy
+  privacy: {
+    title: "Privacy Policy",
+    lastUpdated: "Last updated",
+  },
+
+  // 404
+  notFound: {
+    title: "Page not found",
+    subtitle: "Sorry, we couldn't find the page you're looking for.",
+    backHome: "Back to home",
+  },
+
+  // Loading
+  loading: {
+    text: "Loading...",
   },
 };
 
@@ -1233,6 +1290,57 @@ const es: Translations = {
   nav2: {
     captains: "Capitanes",
     rentals: "Alquileres",
+    about: "Acerca de",
+  },
+
+  footer: {
+    terms: "Términos de Servicio",
+    privacy: "Política de Privacidad",
+  },
+
+  about: {
+    title: "Acerca de KORE",
+    subtitle: "Hacemos que mudarte a España sea simple, transparente y humano.",
+    storyTitle: "Nuestra Historia",
+    storyP1:
+      "KORE fue fundado por un grupo de expatriados que pasaron por el doloroso proceso de inmigración española. Lidiamos con papeleo confuso, barreras idiomáticas y la sensación abrumadora de navegar una burocracia extranjera solos.",
+    storyP2:
+      "Creamos KORE porque creemos que nadie debería tener que resolverlo solo. Nuestra plataforma combina tecnología con apoyo humano real para hacer que mudarse a España sea lo más fácil posible.",
+    missionTitle: "Nuestra Misión",
+    missionText:
+      "Hacer que mudarte a España sea simple, transparente y humano. Eliminamos la complejidad de la inmigración para que puedas concentrarte en comenzar tu nueva vida.",
+    pillarsTitle: "Los Tres Pilares de KORE",
+    pillar1Title: "Procesamiento de Visas",
+    pillar1Desc:
+      "Solicitudes guiadas para cada tipo de visa — desde Nómada Digital hasta Golden Visa. Te acompañamos en cada paso y nos encargamos del papeleo.",
+    pillar2Title: "Guías Locales (Capitanes)",
+    pillar2Desc:
+      "Conéctate con expertos locales verificados que ya pasaron por el proceso. Obtén asesoramiento personalizado sobre vivienda, asuntos legales y adaptación cultural.",
+    pillar3Title: "Vivienda",
+    pillar3Desc:
+      "Encuentra viviendas aptas para visa a través de nuestro mercado de alquileres verificado. Sin estafas, sin barreras idiomáticas — solo un hogar esperándote.",
+    ctaTitle: "¿Listo para comenzar tu viaje?",
+    ctaButton: "Comenzar",
+  },
+
+  terms: {
+    title: "Términos de Servicio",
+    lastUpdated: "Última actualización",
+  },
+
+  privacy: {
+    title: "Política de Privacidad",
+    lastUpdated: "Última actualización",
+  },
+
+  notFound: {
+    title: "Página no encontrada",
+    subtitle: "Lo sentimos, no pudimos encontrar la página que buscas.",
+    backHome: "Volver al inicio",
+  },
+
+  loading: {
+    text: "Cargando...",
   },
 };
 
@@ -1853,8 +1961,59 @@ const ru: Translations = {
   },
 
   nav2: {
-    captains: "\u041a\u0430\u043f\u0438\u0442\u0430\u043d\u044b",
-    rentals: "\u0410\u0440\u0435\u043d\u0434\u0430",
+    captains: "Капитаны",
+    rentals: "Аренда",
+    about: "О нас",
+  },
+
+  footer: {
+    terms: "Условия использования",
+    privacy: "Политика конфиденциальности",
+  },
+
+  about: {
+    title: "О KORE",
+    subtitle: "Делаем переезд в Испанию простым, прозрачным и человечным.",
+    storyTitle: "Наша история",
+    storyP1:
+      "KORE был основан группой экспатов, которые сами прошли через болезненный процесс испанской иммиграции. Мы столкнулись с запутанными документами, языковыми барьерами и подавляющим ощущением навигации по иностранной бюрократии в одиночку.",
+    storyP2:
+      "Мы создали KORE, потому что считаем, что никто не должен разбираться в этом в одиночку. Наша платформа сочетает технологии с реальной человеческой поддержкой, чтобы сделать переезд в Испанию максимально гладким.",
+    missionTitle: "Наша миссия",
+    missionText:
+      "Сделать переезд в Испанию простым, прозрачным и человечным. Мы убираем сложность иммиграции, чтобы вы могли сосредоточиться на начале новой жизни.",
+    pillarsTitle: "Три столпа KORE",
+    pillar1Title: "Оформление виз",
+    pillar1Desc:
+      "Пошаговые заявки для каждого типа визы — от Цифрового кочевника до Золотой визы. Мы проведём вас через каждый шаг и возьмём на себя документы.",
+    pillar2Title: "Местные гиды (Капитаны)",
+    pillar2Desc:
+      "Свяжитесь с проверенными местными экспертами, которые сами прошли через этот процесс. Получите персонализированные советы по жилью, юридическим вопросам и культурной адаптации.",
+    pillar3Title: "Жильё",
+    pillar3Desc:
+      "Найдите жильё, подходящее для визы, через наш проверенный маркетплейс аренды. Никаких мошенников, никаких языковых барьеров — только дом, который вас ждёт.",
+    ctaTitle: "Готовы начать свой путь?",
+    ctaButton: "Начать",
+  },
+
+  terms: {
+    title: "Условия использования",
+    lastUpdated: "Последнее обновление",
+  },
+
+  privacy: {
+    title: "Политика конфиденциальности",
+    lastUpdated: "Последнее обновление",
+  },
+
+  notFound: {
+    title: "Страница не найдена",
+    subtitle: "Извините, мы не смогли найти запрашиваемую страницу.",
+    backHome: "На главную",
+  },
+
+  loading: {
+    text: "Загрузка...",
   },
 };
 
