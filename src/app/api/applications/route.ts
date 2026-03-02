@@ -5,6 +5,8 @@ import { applications, applicationData, documents } from "@/lib/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { applicationPostSchema } from "@/lib/validations";
 
+export const dynamic = "force-dynamic";
+
 // GET: fetch user's application(s) with fields and documents
 export async function GET() {
   try {

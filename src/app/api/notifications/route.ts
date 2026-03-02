@@ -4,6 +4,8 @@ import { db } from "@/lib/db";
 import { notifications } from "@/lib/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 
+export const dynamic = "force-dynamic";
+
 // GET: list notifications for current user
 export async function GET() {
   try {
