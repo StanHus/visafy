@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSession, signOut } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import FadeIn from "@/components/animations/FadeIn";
@@ -28,6 +29,15 @@ interface Application {
   documents: DocInfo[];
 }
 
+interface StatusHistoryEntry {
+  id: string;
+  oldStatus: string | null;
+  newStatus: string;
+  note: string | null;
+  createdAt: string;
+  changedByName: string | null;
+}
+
 const STATUS_STYLES: Record<string, { label: string; color: string; bg: string }> = {
   draft: { label: "Draft", color: "text-gray-600", bg: "bg-gray-100" },
   submitted: { label: "Submitted", color: "text-brand-700", bg: "bg-brand-50" },
@@ -42,17 +52,36 @@ const formatDate = (d: string) => {
   return isNaN(date.getTime()) ? "\u2014" : date.toLocaleDateString();
 };
 
+const formatDateTime = (d: string) => {
+  const date = new Date(d);
+  return isNaN(date.getTime()) ? "\u2014" : date.toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+};
+
 function isImageFile(fileName: string) {
   const ext = fileName.toLowerCase().split(".").pop();
   return ext === "jpg" || ext === "jpeg" || ext === "png";
 }
 
-export default function DashboardPage() {
+function DashboardContent() {
   const { data: session } = useSession();
   const { t } = useLanguage();
+  const searchParams = useSearchParams();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedApp, setExpandedApp] = useState<string | null>(null);
+  const [timelineApp, setTimelineApp] = useState<string | null>(null);
+  const [timeline, setTimeline] = useState<StatusHistoryEntry[]>([]);
+  const [payingApp, setPayingApp] = useState<string | null>(null);
+  const [paymentMessage, setPaymentMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    if (payment === "success") {
+      setPaymentMessage(t.payments.success);
+    } else if (payment === "cancelled") {
+      setPaymentMessage(t.payments.cancelled);
+    }
+  }, [searchParams, t]);
 
   useEffect(() => {
     async function load() {
@@ -70,6 +99,40 @@ export default function DashboardPage() {
     }
     load();
   }, []);
+
+  const loadTimeline = async (appId: string) => {
+    if (timelineApp === appId) {
+      setTimelineApp(null);
+      return;
+    }
+    setTimelineApp(appId);
+    try {
+      const res = await fetch(`/api/status-history?applicationId=${appId}`);
+      const data = await res.json();
+      if (Array.isArray(data)) setTimeline(data);
+    } catch {
+      setTimeline([]);
+    }
+  };
+
+  const handlePayment = async (appId: string, visaType: string) => {
+    setPayingApp(appId);
+    try {
+      const res = await fetch("/api/payments/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ applicationId: appId, visaType }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      console.error("Payment error:", err);
+    } finally {
+      setPayingApp(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -102,6 +165,18 @@ export default function DashboardPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8">
+        {/* Payment message */}
+        {paymentMessage && (
+          <FadeIn duration={300} direction="up">
+            <div className="mb-6 p-4 rounded-xl border border-brand-200 bg-brand-50 text-brand-700 text-sm flex items-center justify-between">
+              <span>{paymentMessage}</span>
+              <button onClick={() => setPaymentMessage(null)} className="text-brand-600 hover:text-brand-800 cursor-pointer text-xs font-medium ml-4">
+                Dismiss
+              </button>
+            </div>
+          </FadeIn>
+        )}
+
         <FadeIn duration={400} direction="up">
           <div className="flex items-center justify-between mb-6 sm:mb-8">
             <div>
@@ -136,6 +211,8 @@ export default function DashboardPage() {
               const statusInfo = STATUS_STYLES[app.status] || STATUS_STYLES.draft;
               const docs = app.documents || [];
               const isExpanded = expandedApp === app.id;
+              const showTimeline = timelineApp === app.id;
+              const canPay = app.status === "submitted";
 
               return (
                 <div
@@ -159,12 +236,29 @@ export default function DashboardPage() {
                           ID: {app.id.slice(0, 8)} &middot; Created {formatDate(app.createdAt)}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         {app.status === "draft" && (
                           <Link href={`/onboarding?id=${app.id}`}>
                             <Button size="sm">{t.dashboard.continueApp}</Button>
                           </Link>
                         )}
+                        {canPay && (
+                          <Button
+                            size="sm"
+                            onClick={() => handlePayment(app.id, app.visaType || "work_visa")}
+                            loading={payingApp === app.id}
+                          >
+                            {t.payments.pay} &euro;499
+                          </Button>
+                        )}
+                        <button
+                          onClick={() => loadTimeline(app.id)}
+                          className={`text-xs transition-colors cursor-pointer px-2 py-1 rounded ${
+                            showTimeline ? "text-brand-600 bg-brand-50" : "text-gray-400 hover:text-gray-600"
+                          }`}
+                        >
+                          {t.dashboard.timeline}
+                        </button>
                         <button
                           onClick={() => setExpandedApp(isExpanded ? null : app.id)}
                           className="text-xs text-gray-400 hover:text-gray-600 transition-colors cursor-pointer px-2 py-1"
@@ -209,6 +303,60 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
+                  {/* Status Timeline */}
+                  {showTimeline && (
+                    <div className="border-t border-gray-100 p-4 sm:p-6 bg-brand-50/30">
+                      <h4 className="text-xs font-medium text-gray-500 mb-3">{t.statusTimeline.title}</h4>
+                      <div className="space-y-3">
+                        <div className="flex gap-3">
+                          <div className="flex flex-col items-center">
+                            <div className="w-2 h-2 rounded-full mt-1.5 bg-gray-400" />
+                            {timeline.length > 0 && <div className="w-px flex-1 bg-gray-200 mt-1" />}
+                          </div>
+                          <div className="pb-1">
+                            <p className="text-xs font-medium text-gray-900">{t.statusTimeline.created}</p>
+                            <p className="text-[11px] text-gray-400">{formatDateTime(app.createdAt)}</p>
+                          </div>
+                        </div>
+
+                        {[...timeline].reverse().map((entry, idx) => {
+                          const isLast = idx === timeline.length - 1;
+                          return (
+                            <div key={entry.id} className="flex gap-3">
+                              <div className="flex flex-col items-center">
+                                <div
+                                  className="w-2 h-2 rounded-full mt-1.5"
+                                  style={{
+                                    backgroundColor:
+                                      entry.newStatus === "approved" ? "#2d4a3e"
+                                      : entry.newStatus === "rejected" ? "#be123c"
+                                      : "#302a7e"
+                                  }}
+                                />
+                                {!isLast && <div className="w-px flex-1 bg-gray-200 mt-1" />}
+                              </div>
+                              <div className="pb-1">
+                                <p className="text-xs font-medium text-gray-900">
+                                  {STATUS_STYLES[entry.newStatus]?.label || entry.newStatus}
+                                </p>
+                                {entry.note && (
+                                  <p className="text-xs text-gray-500 mt-0.5">{entry.note}</p>
+                                )}
+                                <p className="text-[11px] text-gray-400 mt-0.5">
+                                  {formatDateTime(entry.createdAt)}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {timeline.length === 0 && (
+                          <p className="text-xs text-gray-400 pl-5">{t.statusTimeline.noHistory}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Expanded details */}
                   {isExpanded && (
                     <div className="border-t border-gray-100 p-4 sm:p-6 bg-gray-50/50">
@@ -233,7 +381,6 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
-                      {/* Documents list */}
                       {docs.length > 0 && (
                         <div>
                           <h4 className="text-xs font-medium text-gray-500 mb-2">Uploaded Documents</h4>
@@ -258,7 +405,14 @@ export default function DashboardPage() {
                                 )}
                                 <div className="min-w-0 flex-1">
                                   <p className="text-xs text-gray-900 truncate">{doc.fileName}</p>
-                                  <p className="text-[11px] text-gray-400">{doc.documentType.replace(/_/g, " ")}</p>
+                                  <div className="flex items-center gap-1.5">
+                                    <p className="text-[11px] text-gray-400">{doc.documentType.replace(/_/g, " ")}</p>
+                                    {doc.status !== "pending" && (
+                                      <span className={`text-[11px] font-medium ${doc.status === "approved" ? "text-accent-600" : "text-rose-600"}`}>
+                                        {doc.status}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                                 <a
                                   href={doc.fileUrl}
@@ -282,5 +436,19 @@ export default function DashboardPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="animate-spin w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full" />
+        </div>
+      }
+    >
+      <DashboardContent />
+    </Suspense>
   );
 }

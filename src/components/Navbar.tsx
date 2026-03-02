@@ -75,6 +75,14 @@ export default function Navbar() {
 
             {session ? (
               <>
+                {(session.user as { role?: string })?.role === "admin" && (
+                  <Link
+                    href="/admin"
+                    className="text-xs px-2 py-0.5 bg-brand-50 text-brand-700 rounded-full font-medium hover:bg-brand-100 transition-colors duration-150 hidden sm:inline"
+                  >
+                    {t.admin.badge}
+                  </Link>
+                )}
                 <Link
                   href="/dashboard"
                   className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150 hidden sm:inline"
@@ -90,6 +98,12 @@ export default function Navbar() {
               </>
             ) : (
               <>
+                <Link
+                  href="/pricing"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150 hidden sm:inline"
+                >
+                  {t.nav.pricing}
+                </Link>
                 <Link
                   href="/auth/signin"
                   className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150"
