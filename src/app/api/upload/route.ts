@@ -6,6 +6,7 @@ import { applications, documents } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { ALLOWED_UPLOAD_EXTENSIONS, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from "@/lib/constants";
 
+export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {

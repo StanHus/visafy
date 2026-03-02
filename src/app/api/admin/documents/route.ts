@@ -5,6 +5,7 @@ import { documents } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { documentReviewSchema } from "@/lib/validations";
 
+export const dynamic = "force-dynamic";
 // PATCH: approve/reject a document
 export async function PATCH(request: Request) {
   try {

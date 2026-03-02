@@ -7,6 +7,8 @@ import { eq } from "drizzle-orm";
 import { sendPaymentConfirmationEmail } from "@/lib/email";
 import type Stripe from "stripe";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request) {
   try {
     const body = await request.text();

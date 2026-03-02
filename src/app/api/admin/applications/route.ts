@@ -14,6 +14,7 @@ import { eq, inArray, desc, and, like, sql } from "drizzle-orm";
 import { adminStatusUpdateSchema } from "@/lib/validations";
 import { sendStatusChangeEmail } from "@/lib/email";
 
+export const dynamic = "force-dynamic";
 // GET: list all applications with user info (admin only)
 export async function GET(request: Request) {
   try {

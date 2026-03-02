@@ -5,6 +5,7 @@ import { messages, applications, users, notifications } from "@/lib/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { messageSchema } from "@/lib/validations";
 
+export const dynamic = "force-dynamic";
 // GET: get messages for an application
 export async function GET(request: Request) {
   try {

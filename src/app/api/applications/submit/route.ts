@@ -5,6 +5,7 @@ import { applications, statusHistory } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { applicationSubmitSchema } from "@/lib/validations";
 
+export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
     const session = await auth();

@@ -6,6 +6,7 @@ import { eq, and } from "drizzle-orm";
 import { stripe, VISA_PRICES } from "@/lib/stripe";
 import { checkoutSchema } from "@/lib/validations";
 
+export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
     const session = await auth();

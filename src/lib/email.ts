@@ -1,6 +1,10 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | null = null;
+function getResend() {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
 
 const FROM_EMAIL = process.env.FROM_EMAIL || "KORE <noreply@kore.app>";
 
@@ -24,7 +28,7 @@ export async function sendStatusChangeEmail(
   const newLabel = statusLabels[newStatus] || newStatus;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to,
       subject: `Application Update: ${newLabel}`,
@@ -68,7 +72,7 @@ export async function sendPaymentConfirmationEmail(
   visaType: string
 ) {
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to,
       subject: "Payment Confirmation - KORE",

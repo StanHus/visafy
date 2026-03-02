@@ -5,6 +5,7 @@ import { adminNotes, users } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { adminNoteSchema } from "@/lib/validations";
 
+export const dynamic = "force-dynamic";
 // GET: get notes for an application
 export async function GET(request: Request) {
   try {
