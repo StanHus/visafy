@@ -129,9 +129,13 @@ export default function CaptainsPage() {
                   className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
                 >
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="w-14 h-14 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-xl shrink-0">
-                      {cap.fullName.charAt(0)}
-                    </div>
+                    {cap.photoUrl ? (
+                      <img src={cap.photoUrl} alt={cap.fullName} className="w-14 h-14 rounded-full object-cover shrink-0" />
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-xl shrink-0">
+                        {cap.fullName.charAt(0)}
+                      </div>
+                    )}
                     <div className="min-w-0">
                       <h3 className="font-semibold text-gray-900 truncate">
                         {cap.fullName}

@@ -109,9 +109,13 @@ export default function CaptainProfilePage({
         <FadeIn>
           <div className="bg-white rounded-xl border border-gray-200 p-6 sm:p-8 mb-6">
             <div className="flex flex-col sm:flex-row gap-6">
+              {captain.photoUrl ? (
+                <img src={captain.photoUrl} alt={captain.fullName} className="w-24 h-24 rounded-full object-cover shrink-0 mx-auto sm:mx-0" />
+              ) : (
               <div className="w-24 h-24 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-3xl shrink-0 mx-auto sm:mx-0">
                 {captain.fullName.charAt(0)}
               </div>
+              )}
               <div className="flex-1 text-center sm:text-left">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
                   <h1 className="text-2xl font-bold text-gray-900">
