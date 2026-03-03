@@ -101,18 +101,24 @@ export default function LandingPage() {
           <span className="text-sm font-semibold text-gray-900 tracking-tight">
             KORE
           </span>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 text-sm text-gray-400">
             <Link
               href="/terms"
-              className="text-sm text-gray-400 hover:text-gray-600 transition-colors duration-150"
+              className="hover:text-gray-600 transition-colors duration-150"
             >
               {t.footer.terms}
             </Link>
             <Link
               href="/privacy"
-              className="text-sm text-gray-400 hover:text-gray-600 transition-colors duration-150"
+              className="hover:text-gray-600 transition-colors duration-150"
             >
               {t.footer.privacy}
+            </Link>
+            <Link
+              href="/team"
+              className="hover:text-brand-500 transition-colors"
+            >
+              Team
             </Link>
           </div>
           <p className="text-sm text-gray-400">
