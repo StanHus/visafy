@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { LanguageProvider } from "@/lib/i18n-context";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -49,6 +50,7 @@ export default function RootLayout({
         <SessionProvider>
           <LanguageProvider>{children}</LanguageProvider>
         </SessionProvider>
+        <Analytics />
       </body>
     </html>
   );
